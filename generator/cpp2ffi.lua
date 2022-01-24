@@ -170,13 +170,13 @@ local function parse_enum_value(value, allenums,dontpost)
 		value = value:gsub("^(%()",""):gsub("(%))$","")
 		assert(not value:match("[%(%)]"),value)
 		
-		local several,seps = strsplit(value,"([<>&|~%+]+)") 
+		local several,seps = strsplit(value,"([<>&|~%+%-]+)") 
 		--M.prtable(value,several,seps)
 		assert(#seps+1==#several)
 		
 		local i = 1
 		local ik = 1
-		local sepk = {"~","<<",">>","&","^","|","+"}
+		local sepk = {"~","<<",">>","&","^","|","+", "-"}
 		while(#seps>0) do
 			local sep = sepk[ik]
 			local v = seps[i]
@@ -206,6 +206,8 @@ local function parse_enum_value(value, allenums,dontpost)
 					several[i] = bit.bor(val1,val2)
 				elseif v=="+" then
 					several[i] = val1 + val2
+				elseif v=="-" then
+					several[i] = val1 - val2
 				else
 					error("unknown operator "..v)
 				end
