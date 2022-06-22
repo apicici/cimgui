@@ -1,10 +1,10 @@
 ----------------overloadings---------------------------
 ImColor_ImColor	5
 1	nil	ImColor_ImColor_Nil ()
-2	nil	ImColor_ImColor_Int (int,int,int,int)
-3	nil	ImColor_ImColor_U32 (ImU32)
-4	nil	ImColor_ImColor_Float (float,float,float,float)
-5	nil	ImColor_ImColor_Vec4 (const ImVec4)
+2	nil	ImColor_ImColor_Float (float,float,float,float)
+3	nil	ImColor_ImColor_Vec4 (const ImVec4)
+4	nil	ImColor_ImColor_Int (int,int,int,int)
+5	nil	ImColor_ImColor_U32 (ImU32)
 ImDrawList_AddText	2
 1	void	ImDrawList_AddText_Vec2 (const ImVec2,ImU32,const char*,const char*)
 2	void	ImDrawList_AddText_FontPtr (const ImFont*,float,const ImVec2,ImU32,const char*,const char*,float,const ImVec4*)
