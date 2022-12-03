@@ -3206,9 +3206,9 @@
     "ImGuiNavInput": "imgui:1545",
     "ImGuiOnceUponAFrame": "imgui:2282",
     "ImGuiPayload": "imgui:2223",
-    "ImGuiPlatformIO": "imgui:3123",
-    "ImGuiPlatformImeData": "imgui:3195",
-    "ImGuiPlatformMonitor": "imgui:3186",
+    "ImGuiPlatformIO": "imgui:3124",
+    "ImGuiPlatformImeData": "imgui:3196",
+    "ImGuiPlatformMonitor": "imgui:3187",
     "ImGuiPopupFlags_": "imgui:1097",
     "ImGuiSelectableFlags_": "imgui:1113",
     "ImGuiSizeCallbackData": "imgui:2193",
@@ -4780,6 +4780,10 @@
       {
         "name": "PlatformHandleRaw",
         "type": "void*"
+      },
+      {
+        "name": "PlatformWindowCreated",
+        "type": "bool"
       },
       {
         "name": "PlatformRequestMove",
