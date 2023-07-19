@@ -91,8 +91,8 @@ struct ImVec2
     float x, y;
     constexpr ImVec2() : x(0.0f), y(0.0f) { }
     constexpr ImVec2(float _x, float _y) : x(_x), y(_y) { }
-    float& operator[] (size_t idx) {                                              ((void) sizeof ((                                             idx == 0 || idx == 1                                             ) ? 1 : 0), __extension__ ({ if (                                             idx == 0 || idx == 1                                             ) ; else __assert_fail (                                             "idx == 0 || idx == 1"                                             , "../imgui/imgui.h", 265, __extension__ __PRETTY_FUNCTION__); }))                                                                            ; return ((float*)(void*)(char*)this)[idx]; }
-    float operator[] (size_t idx) const {                                              ((void) sizeof ((                                             idx == 0 || idx == 1                                             ) ? 1 : 0), __extension__ ({ if (                                             idx == 0 || idx == 1                                             ) ; else __assert_fail (                                             "idx == 0 || idx == 1"                                             , "../imgui/imgui.h", 266, __extension__ __PRETTY_FUNCTION__); }))                                                                            ; return ((const float*)(const void*)(const char*)this)[idx]; }
+    float& operator[] (size_t idx) {                                              ((void) sizeof ((                                             idx == 0 || idx == 1                                             ) ? 1 : 0), __extension__ ({ if (                                             idx == 0 || idx == 1                                             ) ; else __assert_fail (                                             "idx == 0 || idx == 1"                                             , "../imgui/imgui.h", 267, __extension__ __PRETTY_FUNCTION__); }))                                                                            ; return ((float*)(void*)(char*)this)[idx]; }
+    float operator[] (size_t idx) const {                                              ((void) sizeof ((                                             idx == 0 || idx == 1                                             ) ? 1 : 0), __extension__ ({ if (                                             idx == 0 || idx == 1                                             ) ; else __assert_fail (                                             "idx == 0 || idx == 1"                                             , "../imgui/imgui.h", 268, __extension__ __PRETTY_FUNCTION__); }))                                                                            ; return ((const float*)(const void*)(const char*)this)[idx]; }
 };
 struct ImVec4
 {
@@ -350,6 +350,9 @@ namespace ImGui
     void EndTooltip();
     void SetTooltip(const char* fmt, ...) __attribute__((format(printf, 1, 1 +1)));
     void SetTooltipV(const char* fmt, va_list args) __attribute__((format(printf, 1, 0)));
+    bool BeginItemTooltip();
+    void SetItemTooltip(const char* fmt, ...) __attribute__((format(printf, 1, 1 +1)));
+    void SetItemTooltipV(const char* fmt, va_list args) __attribute__((format(printf, 1, 0)));
     bool BeginPopup(const char* str_id, ImGuiWindowFlags flags = 0);
     bool BeginPopupModal(const char* name, bool* p_open =                                                                             ((void *)0)                                                                                , ImGuiWindowFlags flags = 0);
     void EndPopup();
@@ -418,6 +421,7 @@ namespace ImGui
     void PopClipRect();
     void SetItemDefaultFocus();
     void SetKeyboardFocusHere(int offset = 0);
+    void SetNextItemAllowOverlap();
     bool IsItemHovered(ImGuiHoveredFlags flags = 0);
     bool IsItemActive();
     bool IsItemFocused();
@@ -435,7 +439,6 @@ namespace ImGui
     ImVec2 GetItemRectMin();
     ImVec2 GetItemRectMax();
     ImVec2 GetItemRectSize();
-    void SetItemAllowOverlap();
     ImGuiViewport* GetMainViewport();
     ImDrawList* GetBackgroundDrawList();
     ImDrawList* GetForegroundDrawList();
@@ -562,7 +565,7 @@ enum ImGuiTreeNodeFlags_
     ImGuiTreeNodeFlags_None = 0,
     ImGuiTreeNodeFlags_Selected = 1 << 0,
     ImGuiTreeNodeFlags_Framed = 1 << 1,
-    ImGuiTreeNodeFlags_AllowItemOverlap = 1 << 2,
+    ImGuiTreeNodeFlags_AllowOverlap = 1 << 2,
     ImGuiTreeNodeFlags_NoTreePushOnOpen = 1 << 3,
     ImGuiTreeNodeFlags_NoAutoOpenOnLog = 1 << 4,
     ImGuiTreeNodeFlags_DefaultOpen = 1 << 5,
@@ -597,7 +600,7 @@ enum ImGuiSelectableFlags_
     ImGuiSelectableFlags_SpanAllColumns = 1 << 1,
     ImGuiSelectableFlags_AllowDoubleClick = 1 << 2,
     ImGuiSelectableFlags_Disabled = 1 << 3,
-    ImGuiSelectableFlags_AllowItemOverlap = 1 << 4,
+    ImGuiSelectableFlags_AllowOverlap = 1 << 4,
 };
 enum ImGuiComboFlags_
 {
@@ -738,14 +741,19 @@ enum ImGuiHoveredFlags_
     ImGuiHoveredFlags_DockHierarchy = 1 << 4,
     ImGuiHoveredFlags_AllowWhenBlockedByPopup = 1 << 5,
     ImGuiHoveredFlags_AllowWhenBlockedByActiveItem = 1 << 7,
-    ImGuiHoveredFlags_AllowWhenOverlapped = 1 << 8,
-    ImGuiHoveredFlags_AllowWhenDisabled = 1 << 9,
-    ImGuiHoveredFlags_NoNavOverride = 1 << 10,
+    ImGuiHoveredFlags_AllowWhenOverlappedByItem = 1 << 8,
+    ImGuiHoveredFlags_AllowWhenOverlappedByWindow = 1 << 9,
+    ImGuiHoveredFlags_AllowWhenDisabled = 1 << 10,
+    ImGuiHoveredFlags_NoNavOverride = 1 << 11,
+    ImGuiHoveredFlags_AllowWhenOverlapped = ImGuiHoveredFlags_AllowWhenOverlappedByItem | ImGuiHoveredFlags_AllowWhenOverlappedByWindow,
     ImGuiHoveredFlags_RectOnly = ImGuiHoveredFlags_AllowWhenBlockedByPopup | ImGuiHoveredFlags_AllowWhenBlockedByActiveItem | ImGuiHoveredFlags_AllowWhenOverlapped,
     ImGuiHoveredFlags_RootAndChildWindows = ImGuiHoveredFlags_RootWindow | ImGuiHoveredFlags_ChildWindows,
-    ImGuiHoveredFlags_DelayNormal = 1 << 11,
-    ImGuiHoveredFlags_DelayShort = 1 << 12,
-    ImGuiHoveredFlags_NoSharedDelay = 1 << 13,
+    ImGuiHoveredFlags_ForTooltip = 1 << 11,
+    ImGuiHoveredFlags_Stationary = 1 << 12,
+    ImGuiHoveredFlags_DelayNone = 1 << 13,
+    ImGuiHoveredFlags_DelayShort = 1 << 14,
+    ImGuiHoveredFlags_DelayNormal = 1 << 15,
+    ImGuiHoveredFlags_NoSharedDelay = 1 << 16,
 };
 enum ImGuiDockNodeFlags_
 {
@@ -1127,36 +1135,36 @@ struct ImVector
     inline int size_in_bytes() const { return Size * (int)sizeof(T); }
     inline int max_size() const { return 0x7FFFFFFF / (int)sizeof(T); }
     inline int capacity() const { return Capacity; }
-    inline T& operator[](int i) {                                                              ((void) sizeof ((                                                             i >= 0 && i < Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             i >= 0 && i < Size                                                             ) ; else __assert_fail (                                                             "i >= 0 && i < Size"                                                             , "../imgui/imgui.h", 1876, __extension__ __PRETTY_FUNCTION__); }))                                                                                          ; return Data[i]; }
-    inline const T& operator[](int i) const {                                                              ((void) sizeof ((                                                             i >= 0 && i < Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             i >= 0 && i < Size                                                             ) ; else __assert_fail (                                                             "i >= 0 && i < Size"                                                             , "../imgui/imgui.h", 1877, __extension__ __PRETTY_FUNCTION__); }))                                                                                          ; return Data[i]; }
+    inline T& operator[](int i) {                                                              ((void) sizeof ((                                                             i >= 0 && i < Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             i >= 0 && i < Size                                                             ) ; else __assert_fail (                                                             "i >= 0 && i < Size"                                                             , "../imgui/imgui.h", 1911, __extension__ __PRETTY_FUNCTION__); }))                                                                                          ; return Data[i]; }
+    inline const T& operator[](int i) const {                                                              ((void) sizeof ((                                                             i >= 0 && i < Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             i >= 0 && i < Size                                                             ) ; else __assert_fail (                                                             "i >= 0 && i < Size"                                                             , "../imgui/imgui.h", 1912, __extension__ __PRETTY_FUNCTION__); }))                                                                                          ; return Data[i]; }
     inline T* begin() { return Data; }
     inline const T* begin() const { return Data; }
     inline T* end() { return Data + Size; }
     inline const T* end() const { return Data + Size; }
-    inline T& front() {                                                              ((void) sizeof ((                                                             Size > 0                                                             ) ? 1 : 0), __extension__ ({ if (                                                             Size > 0                                                             ) ; else __assert_fail (                                                             "Size > 0"                                                             , "../imgui/imgui.h", 1883, __extension__ __PRETTY_FUNCTION__); }))                                                                                ; return Data[0]; }
-    inline const T& front() const {                                                              ((void) sizeof ((                                                             Size > 0                                                             ) ? 1 : 0), __extension__ ({ if (                                                             Size > 0                                                             ) ; else __assert_fail (                                                             "Size > 0"                                                             , "../imgui/imgui.h", 1884, __extension__ __PRETTY_FUNCTION__); }))                                                                                ; return Data[0]; }
-    inline T& back() {                                                              ((void) sizeof ((                                                             Size > 0                                                             ) ? 1 : 0), __extension__ ({ if (                                                             Size > 0                                                             ) ; else __assert_fail (                                                             "Size > 0"                                                             , "../imgui/imgui.h", 1885, __extension__ __PRETTY_FUNCTION__); }))                                                                                ; return Data[Size - 1]; }
-    inline const T& back() const {                                                              ((void) sizeof ((                                                             Size > 0                                                             ) ? 1 : 0), __extension__ ({ if (                                                             Size > 0                                                             ) ; else __assert_fail (                                                             "Size > 0"                                                             , "../imgui/imgui.h", 1886, __extension__ __PRETTY_FUNCTION__); }))                                                                                ; return Data[Size - 1]; }
+    inline T& front() {                                                              ((void) sizeof ((                                                             Size > 0                                                             ) ? 1 : 0), __extension__ ({ if (                                                             Size > 0                                                             ) ; else __assert_fail (                                                             "Size > 0"                                                             , "../imgui/imgui.h", 1918, __extension__ __PRETTY_FUNCTION__); }))                                                                                ; return Data[0]; }
+    inline const T& front() const {                                                              ((void) sizeof ((                                                             Size > 0                                                             ) ? 1 : 0), __extension__ ({ if (                                                             Size > 0                                                             ) ; else __assert_fail (                                                             "Size > 0"                                                             , "../imgui/imgui.h", 1919, __extension__ __PRETTY_FUNCTION__); }))                                                                                ; return Data[0]; }
+    inline T& back() {                                                              ((void) sizeof ((                                                             Size > 0                                                             ) ? 1 : 0), __extension__ ({ if (                                                             Size > 0                                                             ) ; else __assert_fail (                                                             "Size > 0"                                                             , "../imgui/imgui.h", 1920, __extension__ __PRETTY_FUNCTION__); }))                                                                                ; return Data[Size - 1]; }
+    inline const T& back() const {                                                              ((void) sizeof ((                                                             Size > 0                                                             ) ? 1 : 0), __extension__ ({ if (                                                             Size > 0                                                             ) ; else __assert_fail (                                                             "Size > 0"                                                             , "../imgui/imgui.h", 1921, __extension__ __PRETTY_FUNCTION__); }))                                                                                ; return Data[Size - 1]; }
     inline void swap(ImVector<T>& rhs) { int rhs_size = rhs.Size; rhs.Size = Size; Size = rhs_size; int rhs_cap = rhs.Capacity; rhs.Capacity = Capacity; Capacity = rhs_cap; T* rhs_data = rhs.Data; rhs.Data = Data; Data = rhs_data; }
     inline int _grow_capacity(int sz) const { int new_capacity = Capacity ? (Capacity + Capacity / 2) : 8; return new_capacity > sz ? new_capacity : sz; }
     inline void resize(int new_size) { if (new_size > Capacity) reserve(_grow_capacity(new_size)); Size = new_size; }
     inline void resize(int new_size, const T& v) { if (new_size > Capacity) reserve(_grow_capacity(new_size)); if (new_size > Size) for (int n = Size; n < new_size; n++) memcpy(&Data[n], &v, sizeof(v)); Size = new_size; }
-    inline void shrink(int new_size) {                                                              ((void) sizeof ((                                                             new_size <= Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             new_size <= Size                                                             ) ; else __assert_fail (                                                             "new_size <= Size"                                                             , "../imgui/imgui.h", 1892, __extension__ __PRETTY_FUNCTION__); }))                                                                                        ; Size = new_size; }
+    inline void shrink(int new_size) {                                                              ((void) sizeof ((                                                             new_size <= Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             new_size <= Size                                                             ) ; else __assert_fail (                                                             "new_size <= Size"                                                             , "../imgui/imgui.h", 1927, __extension__ __PRETTY_FUNCTION__); }))                                                                                        ; Size = new_size; }
     inline void reserve(int new_capacity) { if (new_capacity <= Capacity) return; T* new_data = (T*)ImGui::MemAlloc((size_t)new_capacity * sizeof(T)); if (Data) { memcpy(new_data, Data, (size_t)Size * sizeof(T)); ImGui::MemFree(Data); } Data = new_data; Capacity = new_capacity; }
     inline void reserve_discard(int new_capacity) { if (new_capacity <= Capacity) return; if (Data) ImGui::MemFree(Data); Data = (T*)ImGui::MemAlloc((size_t)new_capacity * sizeof(T)); Capacity = new_capacity; }
     inline void push_back(const T& v) { if (Size == Capacity) reserve(_grow_capacity(Size + 1)); memcpy(&Data[Size], &v, sizeof(v)); Size++; }
-    inline void pop_back() {                                                              ((void) sizeof ((                                                             Size > 0                                                             ) ? 1 : 0), __extension__ ({ if (                                                             Size > 0                                                             ) ; else __assert_fail (                                                             "Size > 0"                                                             , "../imgui/imgui.h", 1898, __extension__ __PRETTY_FUNCTION__); }))                                                                                ; Size--; }
+    inline void pop_back() {                                                              ((void) sizeof ((                                                             Size > 0                                                             ) ? 1 : 0), __extension__ ({ if (                                                             Size > 0                                                             ) ; else __assert_fail (                                                             "Size > 0"                                                             , "../imgui/imgui.h", 1933, __extension__ __PRETTY_FUNCTION__); }))                                                                                ; Size--; }
     inline void push_front(const T& v) { if (Size == 0) push_back(v); else insert(Data, v); }
-    inline T* erase(const T* it) {                                                              ((void) sizeof ((                                                             it >= Data && it < Data + Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             it >= Data && it < Data + Size                                                             ) ; else __assert_fail (                                                             "it >= Data && it < Data + Size"                                                             , "../imgui/imgui.h", 1900, __extension__ __PRETTY_FUNCTION__); }))                                                                                                      ; const ptrdiff_t off = it - Data; memmove(Data + off, Data + off + 1, ((size_t)Size - (size_t)off - 1) * sizeof(T)); Size--; return Data + off; }
-    inline T* erase(const T* it, const T* it_last){                                                              ((void) sizeof ((                                                             it >= Data && it < Data + Size && it_last >= it && it_last <= Data + Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             it >= Data && it < Data + Size && it_last >= it && it_last <= Data + Size                                                             ) ; else __assert_fail (                                                             "it >= Data && it < Data + Size && it_last >= it && it_last <= Data + Size"                                                             , "../imgui/imgui.h", 1901, __extension__ __PRETTY_FUNCTION__); }))                                                                                                                                                 ; const ptrdiff_t count = it_last - it; const ptrdiff_t off = it - Data; memmove(Data + off, Data + off + count, ((size_t)Size - (size_t)off - (size_t)count) * sizeof(T)); Size -= (int)count; return Data + off; }
-    inline T* erase_unsorted(const T* it) {                                                              ((void) sizeof ((                                                             it >= Data && it < Data + Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             it >= Data && it < Data + Size                                                             ) ; else __assert_fail (                                                             "it >= Data && it < Data + Size"                                                             , "../imgui/imgui.h", 1902, __extension__ __PRETTY_FUNCTION__); }))                                                                                                      ; const ptrdiff_t off = it - Data; if (it < Data + Size - 1) memcpy(Data + off, Data + Size - 1, sizeof(T)); Size--; return Data + off; }
-    inline T* insert(const T* it, const T& v) {                                                              ((void) sizeof ((                                                             it >= Data && it <= Data + Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             it >= Data && it <= Data + Size                                                             ) ; else __assert_fail (                                                             "it >= Data && it <= Data + Size"                                                             , "../imgui/imgui.h", 1903, __extension__ __PRETTY_FUNCTION__); }))                                                                                                       ; const ptrdiff_t off = it - Data; if (Size == Capacity) reserve(_grow_capacity(Size + 1)); if (off < (int)Size) memmove(Data + off + 1, Data + off, ((size_t)Size - (size_t)off) * sizeof(T)); memcpy(&Data[off], &v, sizeof(v)); Size++; return Data + off; }
+    inline T* erase(const T* it) {                                                              ((void) sizeof ((                                                             it >= Data && it < Data + Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             it >= Data && it < Data + Size                                                             ) ; else __assert_fail (                                                             "it >= Data && it < Data + Size"                                                             , "../imgui/imgui.h", 1935, __extension__ __PRETTY_FUNCTION__); }))                                                                                                      ; const ptrdiff_t off = it - Data; memmove(Data + off, Data + off + 1, ((size_t)Size - (size_t)off - 1) * sizeof(T)); Size--; return Data + off; }
+    inline T* erase(const T* it, const T* it_last){                                                              ((void) sizeof ((                                                             it >= Data && it < Data + Size && it_last >= it && it_last <= Data + Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             it >= Data && it < Data + Size && it_last >= it && it_last <= Data + Size                                                             ) ; else __assert_fail (                                                             "it >= Data && it < Data + Size && it_last >= it && it_last <= Data + Size"                                                             , "../imgui/imgui.h", 1936, __extension__ __PRETTY_FUNCTION__); }))                                                                                                                                                 ; const ptrdiff_t count = it_last - it; const ptrdiff_t off = it - Data; memmove(Data + off, Data + off + count, ((size_t)Size - (size_t)off - (size_t)count) * sizeof(T)); Size -= (int)count; return Data + off; }
+    inline T* erase_unsorted(const T* it) {                                                              ((void) sizeof ((                                                             it >= Data && it < Data + Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             it >= Data && it < Data + Size                                                             ) ; else __assert_fail (                                                             "it >= Data && it < Data + Size"                                                             , "../imgui/imgui.h", 1937, __extension__ __PRETTY_FUNCTION__); }))                                                                                                      ; const ptrdiff_t off = it - Data; if (it < Data + Size - 1) memcpy(Data + off, Data + Size - 1, sizeof(T)); Size--; return Data + off; }
+    inline T* insert(const T* it, const T& v) {                                                              ((void) sizeof ((                                                             it >= Data && it <= Data + Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             it >= Data && it <= Data + Size                                                             ) ; else __assert_fail (                                                             "it >= Data && it <= Data + Size"                                                             , "../imgui/imgui.h", 1938, __extension__ __PRETTY_FUNCTION__); }))                                                                                                       ; const ptrdiff_t off = it - Data; if (Size == Capacity) reserve(_grow_capacity(Size + 1)); if (off < (int)Size) memmove(Data + off + 1, Data + off, ((size_t)Size - (size_t)off) * sizeof(T)); memcpy(&Data[off], &v, sizeof(v)); Size++; return Data + off; }
     inline bool contains(const T& v) const { const T* data = Data; const T* data_end = Data + Size; while (data < data_end) if (*data++ == v) return true; return false; }
     inline T* find(const T& v) { T* data = Data; const T* data_end = Data + Size; while (data < data_end) if (*data == v) break; else ++data; return data; }
     inline const T* find(const T& v) const { const T* data = Data; const T* data_end = Data + Size; while (data < data_end) if (*data == v) break; else ++data; return data; }
     inline bool find_erase(const T& v) { const T* it = find(v); if (it < Data + Size) { erase(it); return true; } return false; }
     inline bool find_erase_unsorted(const T& v) { const T* it = find(v); if (it < Data + Size) { erase_unsorted(it); return true; } return false; }
-    inline int index_from_ptr(const T* it) const {                                                              ((void) sizeof ((                                                             it >= Data && it < Data + Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             it >= Data && it < Data + Size                                                             ) ; else __assert_fail (                                                             "it >= Data && it < Data + Size"                                                             , "../imgui/imgui.h", 1909, __extension__ __PRETTY_FUNCTION__); }))                                                                                                      ; const ptrdiff_t off = it - Data; return (int)off; }
+    inline int index_from_ptr(const T* it) const {                                                              ((void) sizeof ((                                                             it >= Data && it < Data + Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             it >= Data && it < Data + Size                                                             ) ; else __assert_fail (                                                             "it >= Data && it < Data + Size"                                                             , "../imgui/imgui.h", 1944, __extension__ __PRETTY_FUNCTION__); }))                                                                                                      ; const ptrdiff_t off = it - Data; return (int)off; }
 };
 struct ImGuiStyle
 {
@@ -1204,6 +1212,11 @@ struct ImGuiStyle
     float CurveTessellationTol;
     float CircleTessellationMaxError;
     ImVec4 Colors[ImGuiCol_COUNT];
+    float HoverStationaryDelay;
+    float HoverDelayShort;
+    float HoverDelayNormal;
+    ImGuiHoveredFlags HoverFlagsForTooltipMouse;
+    ImGuiHoveredFlags HoverFlagsForTooltipNav;
     ImGuiStyle();
     void ScaleAllSizes(float scale_factor);
 };
@@ -1223,13 +1236,6 @@ struct ImGuiIO
     float IniSavingRate;
     const char* IniFilename;
     const char* LogFilename;
-    float MouseDoubleClickTime;
-    float MouseDoubleClickMaxDist;
-    float MouseDragThreshold;
-    float KeyRepeatDelay;
-    float KeyRepeatRate;
-    float HoverDelayNormal;
-    float HoverDelayShort;
     void* UserData;
     ImFontAtlas*Fonts;
     float FontGlobalScale;
@@ -1253,9 +1259,15 @@ struct ImGuiIO
     bool ConfigWindowsResizeFromEdges;
     bool ConfigWindowsMoveFromTitleBarOnly;
     float ConfigMemoryCompactTimer;
+    float MouseDoubleClickTime;
+    float MouseDoubleClickMaxDist;
+    float MouseDragThreshold;
+    float KeyRepeatDelay;
+    float KeyRepeatRate;
     bool ConfigDebugBeginReturnValueOnce;
     bool ConfigDebugBeginReturnValueLoop;
     bool ConfigDebugIgnoreFocusLoss;
+    bool ConfigDebugIniSettings;
     const char* BackendPlatformName;
     const char* BackendRendererName;
     void* BackendPlatformUserData;
@@ -1440,7 +1452,7 @@ struct ImGuiTextBuffer
     ImVector<char> Buf;
     static char EmptyString[1];
     ImGuiTextBuffer() { }
-    inline char operator[](int i) const {                                                  ((void) sizeof ((                                                 Buf.Data !=                                                  ((void *)0)) ? 1 : 0), __extension__ ({ if (                                                 Buf.Data !=                                                  ((void *)0)) ; else __assert_fail (                                                 "Buf.Data != ((void *)0)"                                                 , "../imgui/imgui.h", 2356, __extension__ __PRETTY_FUNCTION__); }))                                                                            ; return Buf.Data[i]; }
+    inline char operator[](int i) const {                                                  ((void) sizeof ((                                                 Buf.Data !=                                                  ((void *)0)) ? 1 : 0), __extension__ ({ if (                                                 Buf.Data !=                                                  ((void *)0)) ; else __assert_fail (                                                 "Buf.Data != ((void *)0)"                                                 , "../imgui/imgui.h", 2407, __extension__ __PRETTY_FUNCTION__); }))                                                                            ; return Buf.Data[i]; }
     const char* begin() const { return Buf.Data ? &Buf.front() : EmptyString; }
     const char* end() const { return Buf.Data ? &Buf.back() : EmptyString; }
     int size() const { return Buf.Size ? Buf.Size - 1 : 0; }
@@ -1766,7 +1778,7 @@ struct ImFontAtlas
     const ImWchar* GetGlyphRangesVietnamese();
     int AddCustomRectRegular(int width, int height);
     int AddCustomRectFontGlyph(ImFont* font, ImWchar id, int width, int height, float advance_x, const ImVec2& offset = ImVec2(0, 0));
-    ImFontAtlasCustomRect* GetCustomRectByIndex(int index) {                                                                  ((void) sizeof ((                                                                 index >= 0                                                                 ) ? 1 : 0), __extension__ ({ if (                                                                 index >= 0                                                                 ) ; else __assert_fail (                                                                 "index >= 0"                                                                 , "../imgui/imgui.h", 2975, __extension__ __PRETTY_FUNCTION__); }))                                                                                      ; return &CustomRects[index]; }
+    ImFontAtlasCustomRect* GetCustomRectByIndex(int index) {                                                                  ((void) sizeof ((                                                                 index >= 0                                                                 ) ? 1 : 0), __extension__ ({ if (                                                                 index >= 0                                                                 ) ; else __assert_fail (                                                                 "index >= 0"                                                                 , "../imgui/imgui.h", 3026, __extension__ __PRETTY_FUNCTION__); }))                                                                                      ; return &CustomRects[index]; }
     void CalcCustomRectUV(const ImFontAtlasCustomRect* rect, ImVec2* out_uv_min, ImVec2* out_uv_max) const;
     bool GetMouseCursorTexData(ImGuiMouseCursor cursor, ImVec2* out_offset, ImVec2* out_size, ImVec2 out_uv_border[2], ImVec2 out_uv_fill[2]);
     ImFontAtlasFlags Flags;
@@ -1870,7 +1882,7 @@ struct ImGuiViewport
     bool PlatformRequestResize;
     bool PlatformRequestClose;
     ImGuiViewport() { memset(this, 0, sizeof(*this)); }
-    ~ImGuiViewport() {                          ((void) sizeof ((                         PlatformUserData ==                          ((void *)0)                          && RendererUserData ==                          ((void *)0)) ? 1 : 0), __extension__ ({ if (                         PlatformUserData ==                          ((void *)0)                          && RendererUserData ==                          ((void *)0)) ; else __assert_fail (                         "PlatformUserData == ((void *)0) && RendererUserData == ((void *)0)"                         , "../imgui/imgui.h", 3135, __extension__ __PRETTY_FUNCTION__); }))                                                                                        ; }
+    ~ImGuiViewport() {                          ((void) sizeof ((                         PlatformUserData ==                          ((void *)0)                          && RendererUserData ==                          ((void *)0)) ? 1 : 0), __extension__ ({ if (                         PlatformUserData ==                          ((void *)0)                          && RendererUserData ==                          ((void *)0)) ; else __assert_fail (                         "PlatformUserData == ((void *)0) && RendererUserData == ((void *)0)"                         , "../imgui/imgui.h", 3186, __extension__ __PRETTY_FUNCTION__); }))                                                                                        ; }
     ImVec2 GetCenter() const { return ImVec2(Pos.x + Size.x * 0.5f, Pos.y + Size.y * 0.5f); }
     ImVec2 GetWorkCenter() const { return ImVec2(WorkPos.x + WorkSize.x * 0.5f, WorkPos.y + WorkSize.y * 0.5f); }
 };
