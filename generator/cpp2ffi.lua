@@ -202,6 +202,8 @@ local function parse_enum_value(value, allenums,dontpost)
 		if allenums[clean(value)] then return allenums[clean(value)] end
 		--must be several and operators
 		------------precedence order (hope not ())
+		--delete (int)
+		value = value:gsub("%(int%)","")
 		--first drop outer ()
 		value = value:gsub("^(%()",""):gsub("(%))$","")
 		assert(not value:match("[%(%)]"),value)
@@ -1593,6 +1595,9 @@ function M.Parser()
 
 							local tdt = self:gentemplatetypedef(ttype,template,te)
 							it2 = tdt..code2
+						elseif it2:match"%w+::" then
+							print("clean namespace typedef",it2)
+							it2 = it2:gsub("%w+::","")
 						end
 					elseif it.re_name == "functypedef_re" then
 						it2 = clean_functypedef(it2)
