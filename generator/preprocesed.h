@@ -101,8 +101,8 @@ struct ImVec2
     float x, y;
     constexpr ImVec2() : x(0.0f), y(0.0f) { }
     constexpr ImVec2(float _x, float _y) : x(_x), y(_y) { }
-    float& operator[] (size_t idx) {                                              ((void) sizeof ((                                             idx == 0 || idx == 1                                             ) ? 1 : 0), __extension__ ({ if (                                             idx == 0 || idx == 1                                             ) ; else __assert_fail (                                             "idx == 0 || idx == 1"                                             , "../imgui/imgui.h", 300, __extension__ __PRETTY_FUNCTION__); }))                                                                            ; return ((float*)(void*)(char*)this)[idx]; }
-    float operator[] (size_t idx) const {                                              ((void) sizeof ((                                             idx == 0 || idx == 1                                             ) ? 1 : 0), __extension__ ({ if (                                             idx == 0 || idx == 1                                             ) ; else __assert_fail (                                             "idx == 0 || idx == 1"                                             , "../imgui/imgui.h", 301, __extension__ __PRETTY_FUNCTION__); }))                                                                            ; return ((const float*)(const void*)(const char*)this)[idx]; }
+    float& operator[] (size_t idx) {                                              ((void) sizeof ((                                             idx == 0 || idx == 1                                             ) ? 1 : 0), __extension__ ({ if (                                             idx == 0 || idx == 1                                             ) ; else __assert_fail (                                             "idx == 0 || idx == 1"                                             , "../imgui/imgui.h", 304, __extension__ __PRETTY_FUNCTION__); }))                                                                            ; return ((float*)(void*)(char*)this)[idx]; }
+    float operator[] (size_t idx) const {                                              ((void) sizeof ((                                             idx == 0 || idx == 1                                             ) ? 1 : 0), __extension__ ({ if (                                             idx == 0 || idx == 1                                             ) ; else __assert_fail (                                             "idx == 0 || idx == 1"                                             , "../imgui/imgui.h", 305, __extension__ __PRETTY_FUNCTION__); }))                                                                            ; return ((const float*)(const void*)(const char*)this)[idx]; }
 };
 struct ImVec4
 {
@@ -488,6 +488,7 @@ namespace ImGui
     bool IsMouseClicked(ImGuiMouseButton button, bool repeat = false);
     bool IsMouseReleased(ImGuiMouseButton button);
     bool IsMouseDoubleClicked(ImGuiMouseButton button);
+    bool IsMouseReleasedWithDelay(ImGuiMouseButton button, float delay);
     int GetMouseClickedCount(ImGuiMouseButton button);
     bool IsMouseHoveringRect(const ImVec2& r_min, const ImVec2& r_max, bool clip = true);
     bool IsMousePosValid(const ImVec2* mouse_pos =                                                                      ((void *)0)                                                                         );
@@ -548,12 +549,12 @@ enum ImGuiWindowFlags_
     ImGuiWindowFlags_NoNav = ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoNavFocus,
     ImGuiWindowFlags_NoDecoration = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse,
     ImGuiWindowFlags_NoInputs = ImGuiWindowFlags_NoMouseInputs | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoNavFocus,
+    ImGuiWindowFlags_DockNodeHost = 1 << 23,
     ImGuiWindowFlags_ChildWindow = 1 << 24,
     ImGuiWindowFlags_Tooltip = 1 << 25,
     ImGuiWindowFlags_Popup = 1 << 26,
     ImGuiWindowFlags_Modal = 1 << 27,
     ImGuiWindowFlags_ChildMenu = 1 << 28,
-    ImGuiWindowFlags_DockNodeHost = 1 << 29,
 };
 enum ImGuiChildFlags_
 {
@@ -598,12 +599,13 @@ enum ImGuiInputTextFlags_
     ImGuiInputTextFlags_DisplayEmptyRefVal = 1 << 14,
     ImGuiInputTextFlags_NoHorizontalScroll = 1 << 15,
     ImGuiInputTextFlags_NoUndoRedo = 1 << 16,
-    ImGuiInputTextFlags_CallbackCompletion = 1 << 17,
-    ImGuiInputTextFlags_CallbackHistory = 1 << 18,
-    ImGuiInputTextFlags_CallbackAlways = 1 << 19,
-    ImGuiInputTextFlags_CallbackCharFilter = 1 << 20,
-    ImGuiInputTextFlags_CallbackResize = 1 << 21,
-    ImGuiInputTextFlags_CallbackEdit = 1 << 22,
+    ImGuiInputTextFlags_ElideLeft = 1 << 17,
+    ImGuiInputTextFlags_CallbackCompletion = 1 << 18,
+    ImGuiInputTextFlags_CallbackHistory = 1 << 19,
+    ImGuiInputTextFlags_CallbackAlways = 1 << 20,
+    ImGuiInputTextFlags_CallbackCharFilter = 1 << 21,
+    ImGuiInputTextFlags_CallbackResize = 1 << 22,
+    ImGuiInputTextFlags_CallbackEdit = 1 << 23,
 };
 enum ImGuiTreeNodeFlags_
 {
@@ -621,9 +623,10 @@ enum ImGuiTreeNodeFlags_
     ImGuiTreeNodeFlags_FramePadding = 1 << 10,
     ImGuiTreeNodeFlags_SpanAvailWidth = 1 << 11,
     ImGuiTreeNodeFlags_SpanFullWidth = 1 << 12,
-    ImGuiTreeNodeFlags_SpanTextWidth = 1 << 13,
+    ImGuiTreeNodeFlags_SpanLabelWidth = 1 << 13,
     ImGuiTreeNodeFlags_SpanAllColumns = 1 << 14,
-    ImGuiTreeNodeFlags_NavLeftJumpsBackHere = 1 << 15,
+    ImGuiTreeNodeFlags_LabelSpanAllColumns = 1 << 15,
+    ImGuiTreeNodeFlags_NavLeftJumpsBackHere = 1 << 17,
     ImGuiTreeNodeFlags_CollapsingHeader = ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_NoAutoOpenOnLog,
 };
 enum ImGuiPopupFlags_
@@ -766,6 +769,7 @@ enum ImGuiDataType_
     ImGuiDataType_Float,
     ImGuiDataType_Double,
     ImGuiDataType_Bool,
+    ImGuiDataType_String,
     ImGuiDataType_COUNT
 };
 enum ImGuiDir : int
@@ -786,6 +790,7 @@ enum ImGuiSortDirection : ImU8
 enum ImGuiKey : int
 {
     ImGuiKey_None = 0,
+    ImGuiKey_NamedKey_BEGIN = 512,
     ImGuiKey_Tab = 512,
     ImGuiKey_LeftArrow,
     ImGuiKey_RightArrow,
@@ -865,18 +870,14 @@ enum ImGuiKey : int
     ImGuiKey_GamepadRStickDown,
     ImGuiKey_MouseLeft, ImGuiKey_MouseRight, ImGuiKey_MouseMiddle, ImGuiKey_MouseX1, ImGuiKey_MouseX2, ImGuiKey_MouseWheelX, ImGuiKey_MouseWheelY,
     ImGuiKey_ReservedForModCtrl, ImGuiKey_ReservedForModShift, ImGuiKey_ReservedForModAlt, ImGuiKey_ReservedForModSuper,
-    ImGuiKey_COUNT,
+    ImGuiKey_NamedKey_END,
     ImGuiMod_None = 0,
     ImGuiMod_Ctrl = 1 << 12,
     ImGuiMod_Shift = 1 << 13,
     ImGuiMod_Alt = 1 << 14,
     ImGuiMod_Super = 1 << 15,
     ImGuiMod_Mask_ = 0xF000,
-    ImGuiKey_NamedKey_BEGIN = 512,
-    ImGuiKey_NamedKey_END = ImGuiKey_COUNT,
     ImGuiKey_NamedKey_COUNT = ImGuiKey_NamedKey_END - ImGuiKey_NamedKey_BEGIN,
-    ImGuiKey_KeysData_SIZE = ImGuiKey_NamedKey_COUNT,
-    ImGuiKey_KeysData_OFFSET = ImGuiKey_NamedKey_BEGIN,
 };
 enum ImGuiInputFlags_
 {
@@ -1040,9 +1041,10 @@ enum ImGuiColorEditFlags_
     ImGuiColorEditFlags_NoSidePreview = 1 << 8,
     ImGuiColorEditFlags_NoDragDrop = 1 << 9,
     ImGuiColorEditFlags_NoBorder = 1 << 10,
+    ImGuiColorEditFlags_AlphaOpaque = 1 << 11,
+    ImGuiColorEditFlags_AlphaNoBg = 1 << 12,
+    ImGuiColorEditFlags_AlphaPreviewHalf= 1 << 13,
     ImGuiColorEditFlags_AlphaBar = 1 << 16,
-    ImGuiColorEditFlags_AlphaPreview = 1 << 17,
-    ImGuiColorEditFlags_AlphaPreviewHalf= 1 << 18,
     ImGuiColorEditFlags_HDR = 1 << 19,
     ImGuiColorEditFlags_DisplayRGB = 1 << 20,
     ImGuiColorEditFlags_DisplayHSV = 1 << 21,
@@ -1054,6 +1056,7 @@ enum ImGuiColorEditFlags_
     ImGuiColorEditFlags_InputRGB = 1 << 27,
     ImGuiColorEditFlags_InputHSV = 1 << 28,
     ImGuiColorEditFlags_DefaultOptions_ = ImGuiColorEditFlags_Uint8 | ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_PickerHueBar,
+    ImGuiColorEditFlags_AlphaMask_ = ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_AlphaOpaque | ImGuiColorEditFlags_AlphaNoBg | ImGuiColorEditFlags_AlphaPreviewHalf,
     ImGuiColorEditFlags_DisplayMask_ = ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_DisplayHSV | ImGuiColorEditFlags_DisplayHex,
     ImGuiColorEditFlags_DataTypeMask_ = ImGuiColorEditFlags_Uint8 | ImGuiColorEditFlags_Float,
     ImGuiColorEditFlags_PickerMask_ = ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_PickerHueBar,
@@ -1068,6 +1071,7 @@ enum ImGuiSliderFlags_
     ImGuiSliderFlags_WrapAround = 1 << 8,
     ImGuiSliderFlags_ClampOnInput = 1 << 9,
     ImGuiSliderFlags_ClampZeroRange = 1 << 10,
+    ImGuiSliderFlags_NoSpeedTweaks = 1 << 11,
     ImGuiSliderFlags_AlwaysClamp = ImGuiSliderFlags_ClampOnInput | ImGuiSliderFlags_ClampZeroRange,
     ImGuiSliderFlags_InvalidMask_ = 0x7000000F,
 };
@@ -1366,6 +1370,7 @@ struct ImGuiIO
     bool ConfigDragClickToInputText;
     bool ConfigWindowsResizeFromEdges;
     bool ConfigWindowsMoveFromTitleBarOnly;
+    bool ConfigWindowsCopyContentsWithCtrlC;
     bool ConfigScrollbarScrollByPage;
     float ConfigMemoryCompactTimer;
     float MouseDoubleClickTime;
@@ -1429,7 +1434,7 @@ struct ImGuiIO
     bool KeyAlt;
     bool KeySuper;
     ImGuiKeyChord KeyMods;
-    ImGuiKeyData KeysData[ImGuiKey_KeysData_SIZE];
+    ImGuiKeyData KeysData[ImGuiKey_NamedKey_COUNT];
     bool WantCaptureMouseUnlessPopupClose;
     ImVec2 MousePosPrev;
     ImVec2 MouseClickedPos[5];
@@ -1439,6 +1444,7 @@ struct ImGuiIO
     ImU16 MouseClickedCount[5];
     ImU16 MouseClickedLastCount[5];
     bool MouseReleased[5];
+    double MouseReleasedTime[5];
     bool MouseDownOwned[5];
     bool MouseDownOwnedUnlessPopupClose[5];
     bool MouseWheelRequestAxisSwap;
@@ -1450,8 +1456,6 @@ struct ImGuiIO
     float PenPressure;
     bool AppFocusLost;
     bool AppAcceptingEvents;
-    ImS8 BackendUsingLegacyKeyArrays;
-    bool BackendUsingLegacyNavInputArray;
     ImWchar16 InputQueueSurrogate;
     ImVector<ImWchar> InputQueueCharacters;
     ImGuiIO();
@@ -1546,7 +1550,7 @@ struct ImGuiTextBuffer
     ImVector<char> Buf;
     static char EmptyString[1];
     ImGuiTextBuffer() { }
-    inline char operator[](int i) const {                                                  ((void) sizeof ((                                                 Buf.Data !=                                                  ((void *)0)) ? 1 : 0), __extension__ ({ if (                                                 Buf.Data !=                                                  ((void *)0)) ; else __assert_fail (                                                 "Buf.Data != ((void *)0)"                                                 , "../imgui/imgui.h", 2700, __extension__ __PRETTY_FUNCTION__); }))                                                                            ; return Buf.Data[i]; }
+    inline char operator[](int i) const {                                                  ((void) sizeof ((                                                 Buf.Data !=                                                  ((void *)0)) ? 1 : 0), __extension__ ({ if (                                                 Buf.Data !=                                                  ((void *)0)) ; else __assert_fail (                                                 "Buf.Data != ((void *)0)"                                                 , "../imgui/imgui.h", 2701, __extension__ __PRETTY_FUNCTION__); }))                                                                            ; return Buf.Data[i]; }
     const char* begin() const { return Buf.Data ? &Buf.front() : EmptyString; }
     const char* end() const { return Buf.Data ? &Buf.back() : EmptyString; }
     int size() const { return Buf.Size ? Buf.Size - 1 : 0; }
@@ -1772,8 +1776,8 @@ struct ImDrawList
     ImVector<ImU8> _CallbacksDataBuf;
     float _FringeScale;
     const char* _OwnerName;
-    ImDrawList(ImDrawListSharedData* shared_data) { memset(this, 0, sizeof(*this)); _Data = shared_data; }
-    ~ImDrawList() { _ClearFreeMemory(); }
+    ImDrawList(ImDrawListSharedData* shared_data);
+    ~ImDrawList();
     void PushClipRect(const ImVec2& clip_rect_min, const ImVec2& clip_rect_max, bool intersect_with_current_clip_rect = false);
     void PushClipRectFullScreen();
     void PopClipRect();
@@ -1796,7 +1800,7 @@ struct ImDrawList
     void AddEllipse(const ImVec2& center, const ImVec2& radius, ImU32 col, float rot = 0.0f, int num_segments = 0, float thickness = 1.0f);
     void AddEllipseFilled(const ImVec2& center, const ImVec2& radius, ImU32 col, float rot = 0.0f, int num_segments = 0);
     void AddText(const ImVec2& pos, ImU32 col, const char* text_begin, const char* text_end =                                                                                                         ((void *)0)                                                                                                            );
-    void AddText(const ImFont* font, float font_size, const ImVec2& pos, ImU32 col, const char* text_begin, const char* text_end =                                                                                                                                              ((void *)0)                                                                                                                                                 , float wrap_width = 0.0f, const ImVec4* cpu_fine_clip_rect =                                                                                                                                                                                                                ((void *)0)                                                                                                                                                                                                                   );
+    void AddText(ImFont* font, float font_size, const ImVec2& pos, ImU32 col, const char* text_begin, const char* text_end =                                                                                                                                        ((void *)0)                                                                                                                                           , float wrap_width = 0.0f, const ImVec4* cpu_fine_clip_rect =                                                                                                                                                                                                          ((void *)0)                                                                                                                                                                                                             );
     void AddBezierCubic(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImU32 col, float thickness, int num_segments = 0);
     void AddBezierQuadratic(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, ImU32 col, float thickness, int num_segments = 0);
     void AddPolyline(const ImVec2* points, int num_points, ImU32 col, ImDrawFlags flags, float thickness);
@@ -1865,17 +1869,17 @@ struct ImFontConfig
     void* FontData;
     int FontDataSize;
     bool FontDataOwnedByAtlas;
+    bool MergeMode;
+    bool PixelSnapH;
     int FontNo;
-    float SizePixels;
     int OversampleH;
     int OversampleV;
-    bool PixelSnapH;
+    float SizePixels;
     ImVec2 GlyphExtraSpacing;
     ImVec2 GlyphOffset;
     const ImWchar* GlyphRanges;
     float GlyphMinAdvanceX;
     float GlyphMaxAdvanceX;
-    bool MergeMode;
     unsigned int FontBuilderFlags;
     float RasterizerMultiply;
     float RasterizerDensity;
@@ -1907,13 +1911,14 @@ struct ImFontGlyphRangesBuilder
 };
 struct ImFontAtlasCustomRect
 {
-    unsigned short Width, Height;
     unsigned short X, Y;
-    unsigned int GlyphID;
+    unsigned short Width, Height;
+    unsigned int GlyphID : 31;
+    unsigned int GlyphColored : 1;
     float GlyphAdvanceX;
     ImVec2 GlyphOffset;
     ImFont* Font;
-    ImFontAtlasCustomRect() { Width = Height = 0; X = Y = 0xFFFF; GlyphID = 0; GlyphAdvanceX = 0.0f; GlyphOffset = ImVec2(0, 0); Font =                                                                                                                                                ((void *)0)                                                                                                                                                   ; }
+    ImFontAtlasCustomRect() { X = Y = 0xFFFF; Width = Height = 0; GlyphID = 0; GlyphColored = 0; GlyphAdvanceX = 0.0f; GlyphOffset = ImVec2(0, 0); Font =                                                                                                                                                                  ((void *)0)                                                                                                                                                                     ; }
     bool IsPacked() const { return X != 0xFFFF; }
 };
 enum ImFontAtlasFlags_
@@ -1934,8 +1939,8 @@ struct ImFontAtlas
     ImFont* AddFontFromMemoryCompressedTTF(const void* compressed_font_data, int compressed_font_data_size, float size_pixels, const ImFontConfig* font_cfg =                                                                                                                                                                                  ((void *)0)                                                                                                                                                                                     , const ImWchar* glyph_ranges =                                                                                                                                                                                                                      ((void *)0)                                                                                                                                                                                                                         );
     ImFont* AddFontFromMemoryCompressedBase85TTF(const char* compressed_font_data_base85, float size_pixels, const ImFontConfig* font_cfg =                                                                                                                                                                ((void *)0)                                                                                                                                                                   , const ImWchar* glyph_ranges =                                                                                                                                                                                                    ((void *)0)                                                                                                                                                                                                       );
     void ClearInputData();
-    void ClearTexData();
     void ClearFonts();
+    void ClearTexData();
     void Clear();
     bool Build();
     void GetTexDataAsAlpha8(unsigned char** out_pixels, int* out_width, int* out_height, int* out_bytes_per_pixel =                                                                                                                                           ((void *)0)                                                                                                                                              );
@@ -1953,15 +1958,15 @@ struct ImFontAtlas
     const ImWchar* GetGlyphRangesVietnamese();
     int AddCustomRectRegular(int width, int height);
     int AddCustomRectFontGlyph(ImFont* font, ImWchar id, int width, int height, float advance_x, const ImVec2& offset = ImVec2(0, 0));
-    ImFontAtlasCustomRect* GetCustomRectByIndex(int index) {                                                                  ((void) sizeof ((                                                                 index >= 0                                                                 ) ? 1 : 0), __extension__ ({ if (                                                                 index >= 0                                                                 ) ; else __assert_fail (                                                                 "index >= 0"                                                                 , "../imgui/imgui.h", 3512, __extension__ __PRETTY_FUNCTION__); }))                                                                                      ; return &CustomRects[index]; }
+    ImFontAtlasCustomRect* GetCustomRectByIndex(int index) {                                                                  ((void) sizeof ((                                                                 index >= 0                                                                 ) ? 1 : 0), __extension__ ({ if (                                                                 index >= 0                                                                 ) ; else __assert_fail (                                                                 "index >= 0"                                                                 , "../imgui/imgui.h", 3519, __extension__ __PRETTY_FUNCTION__); }))                                                                                      ; return &CustomRects[index]; }
     void CalcCustomRectUV(const ImFontAtlasCustomRect* rect, ImVec2* out_uv_min, ImVec2* out_uv_max) const;
     bool GetMouseCursorTexData(ImGuiMouseCursor cursor, ImVec2* out_offset, ImVec2* out_size, ImVec2 out_uv_border[2], ImVec2 out_uv_fill[2]);
     ImFontAtlasFlags Flags;
     ImTextureID TexID;
     int TexDesiredWidth;
     int TexGlyphPadding;
-    bool Locked;
     void* UserData;
+    bool Locked;
     bool TexReady;
     bool TexPixelsUseColors;
     unsigned char* TexPixelsAlpha8;
@@ -1973,7 +1978,7 @@ struct ImFontAtlas
     ImVector<ImFont*> Fonts;
     ImVector<ImFontAtlasCustomRect> CustomRects;
     ImVector<ImFontConfig> ConfigData;
-    ImVec4 TexUvLines[(63) + 1];
+    ImVec4 TexUvLines[(32) + 1];
     const ImFontBuilderIO* FontBuilderIO;
     unsigned int FontBuilderFlags;
     int PackIdMouseCursors;
@@ -1984,33 +1989,33 @@ struct ImFont
     ImVector<float> IndexAdvanceX;
     float FallbackAdvanceX;
     float FontSize;
-    ImVector<ImWchar> IndexLookup;
+    ImVector<ImU16> IndexLookup;
     ImVector<ImFontGlyph> Glyphs;
     const ImFontGlyph* FallbackGlyph;
     ImFontAtlas* ContainerAtlas;
     const ImFontConfig* ConfigData;
     short ConfigDataCount;
-    ImWchar FallbackChar;
-    ImWchar EllipsisChar;
     short EllipsisCharCount;
+    ImWchar EllipsisChar;
+    ImWchar FallbackChar;
     float EllipsisWidth;
     float EllipsisCharStep;
-    bool DirtyLookupTables;
     float Scale;
     float Ascent, Descent;
     int MetricsTotalSurface;
-    ImU8 Used4kPagesMap[(0xFFFF +1)/4096/8];
+    bool DirtyLookupTables;
+    ImU8 Used8kPagesMap[(0xFFFF +1)/8192/8];
     ImFont();
     ~ImFont();
-    const ImFontGlyph*FindGlyph(ImWchar c) const;
-    const ImFontGlyph*FindGlyphNoFallback(ImWchar c) const;
-    float GetCharAdvance(ImWchar c) const { return ((int)c < IndexAdvanceX.Size) ? IndexAdvanceX[(int)c] : FallbackAdvanceX; }
-    bool IsLoaded() const { return ContainerAtlas !=                                                                                               ((void *)0)                                                                                                  ; }
+    const ImFontGlyph*FindGlyph(ImWchar c);
+    const ImFontGlyph*FindGlyphNoFallback(ImWchar c);
+    float GetCharAdvance(ImWchar c) { return ((int)c < IndexAdvanceX.Size) ? IndexAdvanceX[(int)c] : FallbackAdvanceX; }
+    bool IsLoaded() const { return ContainerAtlas !=                                                                                           ((void *)0)                                                                                              ; }
     const char* GetDebugName() const { return ConfigData ? ConfigData->Name : "<unknown>"; }
-    ImVec2 CalcTextSizeA(float size, float max_width, float wrap_width, const char* text_begin, const char* text_end =                                                                                                                                            ((void *)0)                                                                                                                                               , const char** remaining =                                                                                                                                                                           ((void *)0)                                                                                                                                                                              ) const;
-    const char* CalcWordWrapPositionA(float scale, const char* text, const char* text_end, float wrap_width) const;
-    void RenderChar(ImDrawList* draw_list, float size, const ImVec2& pos, ImU32 col, ImWchar c) const;
-    void RenderText(ImDrawList* draw_list, float size, const ImVec2& pos, ImU32 col, const ImVec4& clip_rect, const char* text_begin, const char* text_end, float wrap_width = 0.0f, bool cpu_fine_clip = false) const;
+    ImVec2 CalcTextSizeA(float size, float max_width, float wrap_width, const char* text_begin, const char* text_end =                                                                                                                                            ((void *)0)                                                                                                                                               , const char** remaining =                                                                                                                                                                           ((void *)0)                                                                                                                                                                              );
+    const char* CalcWordWrapPositionA(float scale, const char* text, const char* text_end, float wrap_width);
+    void RenderChar(ImDrawList* draw_list, float size, const ImVec2& pos, ImU32 col, ImWchar c);
+    void RenderText(ImDrawList* draw_list, float size, const ImVec2& pos, ImU32 col, const ImVec4& clip_rect, const char* text_begin, const char* text_end, float wrap_width = 0.0f, bool cpu_fine_clip = false);
     void BuildLookupTable();
     void ClearOutputData();
     void GrowIndex(int new_size);
@@ -2057,7 +2062,7 @@ struct ImGuiViewport
     bool PlatformRequestResize;
     bool PlatformRequestClose;
     ImGuiViewport() { memset(this, 0, sizeof(*this)); }
-    ~ImGuiViewport() {                          ((void) sizeof ((                         PlatformUserData ==                          ((void *)0)                          && RendererUserData ==                          ((void *)0)) ? 1 : 0), __extension__ ({ if (                         PlatformUserData ==                          ((void *)0)                          && RendererUserData ==                          ((void *)0)) ; else __assert_fail (                         "PlatformUserData == ((void *)0) && RendererUserData == ((void *)0)"                         , "../imgui/imgui.h", 3672, __extension__ __PRETTY_FUNCTION__); }))                                                                                        ; }
+    ~ImGuiViewport() {                          ((void) sizeof ((                         PlatformUserData ==                          ((void *)0)                          && RendererUserData ==                          ((void *)0)) ? 1 : 0), __extension__ ({ if (                         PlatformUserData ==                          ((void *)0)                          && RendererUserData ==                          ((void *)0)) ; else __assert_fail (                         "PlatformUserData == ((void *)0) && RendererUserData == ((void *)0)"                         , "../imgui/imgui.h", 3680, __extension__ __PRETTY_FUNCTION__); }))                                                                                        ; }
     ImVec2 GetCenter() const { return ImVec2(Pos.x + Size.x * 0.5f, Pos.y + Size.y * 0.5f); }
     ImVec2 GetWorkCenter() const { return ImVec2(WorkPos.x + WorkSize.x * 0.5f, WorkPos.y + WorkSize.y * 0.5f); }
 };
@@ -2115,3 +2120,23 @@ struct ImGuiPlatformImeData
     float InputLineHeight;
     ImGuiPlatformImeData() { memset(this, 0, sizeof(*this)); }
 };
+struct ImFontAtlas;
+struct ImFontBuilderIO;
+enum ImGuiFreeTypeBuilderFlags
+{
+    ImGuiFreeTypeBuilderFlags_NoHinting = 1 << 0,
+    ImGuiFreeTypeBuilderFlags_NoAutoHint = 1 << 1,
+    ImGuiFreeTypeBuilderFlags_ForceAutoHint = 1 << 2,
+    ImGuiFreeTypeBuilderFlags_LightHinting = 1 << 3,
+    ImGuiFreeTypeBuilderFlags_MonoHinting = 1 << 4,
+    ImGuiFreeTypeBuilderFlags_Bold = 1 << 5,
+    ImGuiFreeTypeBuilderFlags_Oblique = 1 << 6,
+    ImGuiFreeTypeBuilderFlags_Monochrome = 1 << 7,
+    ImGuiFreeTypeBuilderFlags_LoadColor = 1 << 8,
+    ImGuiFreeTypeBuilderFlags_Bitmap = 1 << 9
+};
+namespace ImGuiFreeType
+{
+    const ImFontBuilderIO* GetBuilderForFreeType();
+    void SetAllocatorFunctions(void* (*alloc_func)(size_t sz, void* user_data), void (*free_func)(void* ptr, void* user_data), void* user_data = nullptr);
+}
