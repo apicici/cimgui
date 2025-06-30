@@ -45,10 +45,13 @@ add_compile_definitions("IMGUI_IMPL_OPENGL_LOADER_GL3W")
 option(IMGUI_FREETYPE "add Freetype2" OFF)
 
 if(IMGUI_FREETYPE)
+	message("building with freetype")
 	FIND_PACKAGE(freetype REQUIRED PATHS ${FREETYPE_PATH})
 	list(APPEND IMGUI_LIBRARIES freetype)
 	list(APPEND IMGUI_SOURCES ../../imgui/misc/freetype/imgui_freetype.cpp)
-	add_definitions("-DCIMGUI_FREETYPE=1")
+	#add_definitions("-DCIMGUI_FREETYPE=1")
+	add_definitions("-DIMGUI_ENABLE_FREETYPE=1")
+	add_definitions("-DIMGUI_ENABLE_STB_TRUETYPE=1")
 endif(IMGUI_FREETYPE)
 
 # opengl3
@@ -106,7 +109,6 @@ target_link_libraries(cimgui ${IMGUI_LIBRARIES} glfw)
 
 
 # using library
-include_directories(../../generator/output/)
 add_executable(${PROJECT_NAME} main.c)
 target_compile_definitions(${PROJECT_NAME} PUBLIC -DCIMGUI_USE_OPENGL3 -DCIMGUI_USE_GLFW)
 target_link_libraries(${PROJECT_NAME} cimgui)

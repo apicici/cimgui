@@ -1,4 +1,4 @@
-#define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
+//#define CIMGUI_DEFINE_ENUMS_AND_STRUCTS is done in cmake
 #include "cimgui.h"
 #include "cimgui_impl.h"
 #define D3D11_NO_HELPERS
@@ -23,6 +23,8 @@
 #define igColorEdit3 igColorEdit3_Str
 #define igButton igButton_Str
 #endif
+
+#define igGetIO igGetIO_Nil
 
 GLFWwindow *window;
 
