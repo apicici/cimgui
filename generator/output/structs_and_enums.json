@@ -121,6 +121,28 @@
         "value": "1 << 2"
       }
     ],
+    "ImFontFlags_": [
+      {
+        "calc_value": 0,
+        "name": "ImFontFlags_None",
+        "value": "0"
+      },
+      {
+        "calc_value": 2,
+        "name": "ImFontFlags_NoLoadError",
+        "value": "1 << 1"
+      },
+      {
+        "calc_value": 4,
+        "name": "ImFontFlags_NoLoadGlyphs",
+        "value": "1 << 2"
+      },
+      {
+        "calc_value": 8,
+        "name": "ImFontFlags_LockBakedSizes",
+        "value": "1 << 3"
+      }
+    ],
     "ImGuiBackendFlags_": [
       {
         "calc_value": 0,
@@ -146,6 +168,11 @@
         "calc_value": 8,
         "name": "ImGuiBackendFlags_RendererHasVtxOffset",
         "value": "1 << 3"
+      },
+      {
+        "calc_value": 16,
+        "name": "ImGuiBackendFlags_RendererHasTextures",
+        "value": "1 << 4"
       },
       {
         "calc_value": 1024,
@@ -415,133 +442,143 @@
       },
       {
         "calc_value": 33,
-        "name": "ImGuiCol_TabHovered",
+        "name": "ImGuiCol_InputTextCursor",
         "value": "33"
       },
       {
         "calc_value": 34,
-        "name": "ImGuiCol_Tab",
+        "name": "ImGuiCol_TabHovered",
         "value": "34"
       },
       {
         "calc_value": 35,
-        "name": "ImGuiCol_TabSelected",
+        "name": "ImGuiCol_Tab",
         "value": "35"
       },
       {
         "calc_value": 36,
-        "name": "ImGuiCol_TabSelectedOverline",
+        "name": "ImGuiCol_TabSelected",
         "value": "36"
       },
       {
         "calc_value": 37,
-        "name": "ImGuiCol_TabDimmed",
+        "name": "ImGuiCol_TabSelectedOverline",
         "value": "37"
       },
       {
         "calc_value": 38,
-        "name": "ImGuiCol_TabDimmedSelected",
+        "name": "ImGuiCol_TabDimmed",
         "value": "38"
       },
       {
         "calc_value": 39,
-        "name": "ImGuiCol_TabDimmedSelectedOverline",
+        "name": "ImGuiCol_TabDimmedSelected",
         "value": "39"
       },
       {
         "calc_value": 40,
-        "name": "ImGuiCol_DockingPreview",
+        "name": "ImGuiCol_TabDimmedSelectedOverline",
         "value": "40"
       },
       {
         "calc_value": 41,
-        "name": "ImGuiCol_DockingEmptyBg",
+        "name": "ImGuiCol_DockingPreview",
         "value": "41"
       },
       {
         "calc_value": 42,
-        "name": "ImGuiCol_PlotLines",
+        "name": "ImGuiCol_DockingEmptyBg",
         "value": "42"
       },
       {
         "calc_value": 43,
-        "name": "ImGuiCol_PlotLinesHovered",
+        "name": "ImGuiCol_PlotLines",
         "value": "43"
       },
       {
         "calc_value": 44,
-        "name": "ImGuiCol_PlotHistogram",
+        "name": "ImGuiCol_PlotLinesHovered",
         "value": "44"
       },
       {
         "calc_value": 45,
-        "name": "ImGuiCol_PlotHistogramHovered",
+        "name": "ImGuiCol_PlotHistogram",
         "value": "45"
       },
       {
         "calc_value": 46,
-        "name": "ImGuiCol_TableHeaderBg",
+        "name": "ImGuiCol_PlotHistogramHovered",
         "value": "46"
       },
       {
         "calc_value": 47,
-        "name": "ImGuiCol_TableBorderStrong",
+        "name": "ImGuiCol_TableHeaderBg",
         "value": "47"
       },
       {
         "calc_value": 48,
-        "name": "ImGuiCol_TableBorderLight",
+        "name": "ImGuiCol_TableBorderStrong",
         "value": "48"
       },
       {
         "calc_value": 49,
-        "name": "ImGuiCol_TableRowBg",
+        "name": "ImGuiCol_TableBorderLight",
         "value": "49"
       },
       {
         "calc_value": 50,
-        "name": "ImGuiCol_TableRowBgAlt",
+        "name": "ImGuiCol_TableRowBg",
         "value": "50"
       },
       {
         "calc_value": 51,
-        "name": "ImGuiCol_TextLink",
+        "name": "ImGuiCol_TableRowBgAlt",
         "value": "51"
       },
       {
         "calc_value": 52,
-        "name": "ImGuiCol_TextSelectedBg",
+        "name": "ImGuiCol_TextLink",
         "value": "52"
       },
       {
         "calc_value": 53,
-        "name": "ImGuiCol_DragDropTarget",
+        "name": "ImGuiCol_TextSelectedBg",
         "value": "53"
       },
       {
         "calc_value": 54,
-        "name": "ImGuiCol_NavCursor",
+        "name": "ImGuiCol_TreeLines",
         "value": "54"
       },
       {
         "calc_value": 55,
-        "name": "ImGuiCol_NavWindowingHighlight",
+        "name": "ImGuiCol_DragDropTarget",
         "value": "55"
       },
       {
         "calc_value": 56,
-        "name": "ImGuiCol_NavWindowingDimBg",
+        "name": "ImGuiCol_NavCursor",
         "value": "56"
       },
       {
         "calc_value": 57,
-        "name": "ImGuiCol_ModalWindowDimBg",
+        "name": "ImGuiCol_NavWindowingHighlight",
         "value": "57"
       },
       {
         "calc_value": 58,
-        "name": "ImGuiCol_COUNT",
+        "name": "ImGuiCol_NavWindowingDimBg",
         "value": "58"
+      },
+      {
+        "calc_value": 59,
+        "name": "ImGuiCol_ModalWindowDimBg",
+        "value": "59"
+      },
+      {
+        "calc_value": 60,
+        "name": "ImGuiCol_COUNT",
+        "value": "60"
       }
     ],
     "ImGuiColorEditFlags_": [
@@ -822,16 +859,6 @@
         "value": "1 << 10"
       },
       {
-        "calc_value": 16384,
-        "name": "ImGuiConfigFlags_DpiEnableScaleViewports",
-        "value": "1 << 14"
-      },
-      {
-        "calc_value": 32768,
-        "name": "ImGuiConfigFlags_DpiEnableScaleFonts",
-        "value": "1 << 15"
-      },
-      {
         "calc_value": 1048576,
         "name": "ImGuiConfigFlags_IsSRGB",
         "value": "1 << 20"
@@ -1087,55 +1114,55 @@
         "value": "ImGuiFocusedFlags_RootWindow | ImGuiFocusedFlags_ChildWindows"
       }
     ],
-    "ImGuiFreeTypeBuilderFlags": [
+    "ImGuiFreeTypeLoaderFlags_": [
       {
         "calc_value": 1,
-        "name": "ImGuiFreeTypeBuilderFlags_NoHinting",
+        "name": "ImGuiFreeTypeLoaderFlags_NoHinting",
         "value": "1 << 0"
       },
       {
         "calc_value": 2,
-        "name": "ImGuiFreeTypeBuilderFlags_NoAutoHint",
+        "name": "ImGuiFreeTypeLoaderFlags_NoAutoHint",
         "value": "1 << 1"
       },
       {
         "calc_value": 4,
-        "name": "ImGuiFreeTypeBuilderFlags_ForceAutoHint",
+        "name": "ImGuiFreeTypeLoaderFlags_ForceAutoHint",
         "value": "1 << 2"
       },
       {
         "calc_value": 8,
-        "name": "ImGuiFreeTypeBuilderFlags_LightHinting",
+        "name": "ImGuiFreeTypeLoaderFlags_LightHinting",
         "value": "1 << 3"
       },
       {
         "calc_value": 16,
-        "name": "ImGuiFreeTypeBuilderFlags_MonoHinting",
+        "name": "ImGuiFreeTypeLoaderFlags_MonoHinting",
         "value": "1 << 4"
       },
       {
         "calc_value": 32,
-        "name": "ImGuiFreeTypeBuilderFlags_Bold",
+        "name": "ImGuiFreeTypeLoaderFlags_Bold",
         "value": "1 << 5"
       },
       {
         "calc_value": 64,
-        "name": "ImGuiFreeTypeBuilderFlags_Oblique",
+        "name": "ImGuiFreeTypeLoaderFlags_Oblique",
         "value": "1 << 6"
       },
       {
         "calc_value": 128,
-        "name": "ImGuiFreeTypeBuilderFlags_Monochrome",
+        "name": "ImGuiFreeTypeLoaderFlags_Monochrome",
         "value": "1 << 7"
       },
       {
         "calc_value": 256,
-        "name": "ImGuiFreeTypeBuilderFlags_LoadColor",
+        "name": "ImGuiFreeTypeLoaderFlags_LoadColor",
         "value": "1 << 8"
       },
       {
         "calc_value": 512,
-        "name": "ImGuiFreeTypeBuilderFlags_Bitmap",
+        "name": "ImGuiFreeTypeLoaderFlags_Bitmap",
         "value": "1 << 9"
       }
     ],
@@ -2075,183 +2102,193 @@
       },
       {
         "calc_value": 631,
-        "name": "ImGuiKey_GamepadStart",
+        "name": "ImGuiKey_Oem102",
         "value": "631"
       },
       {
         "calc_value": 632,
-        "name": "ImGuiKey_GamepadBack",
+        "name": "ImGuiKey_GamepadStart",
         "value": "632"
       },
       {
         "calc_value": 633,
-        "name": "ImGuiKey_GamepadFaceLeft",
+        "name": "ImGuiKey_GamepadBack",
         "value": "633"
       },
       {
         "calc_value": 634,
-        "name": "ImGuiKey_GamepadFaceRight",
+        "name": "ImGuiKey_GamepadFaceLeft",
         "value": "634"
       },
       {
         "calc_value": 635,
-        "name": "ImGuiKey_GamepadFaceUp",
+        "name": "ImGuiKey_GamepadFaceRight",
         "value": "635"
       },
       {
         "calc_value": 636,
-        "name": "ImGuiKey_GamepadFaceDown",
+        "name": "ImGuiKey_GamepadFaceUp",
         "value": "636"
       },
       {
         "calc_value": 637,
-        "name": "ImGuiKey_GamepadDpadLeft",
+        "name": "ImGuiKey_GamepadFaceDown",
         "value": "637"
       },
       {
         "calc_value": 638,
-        "name": "ImGuiKey_GamepadDpadRight",
+        "name": "ImGuiKey_GamepadDpadLeft",
         "value": "638"
       },
       {
         "calc_value": 639,
-        "name": "ImGuiKey_GamepadDpadUp",
+        "name": "ImGuiKey_GamepadDpadRight",
         "value": "639"
       },
       {
         "calc_value": 640,
-        "name": "ImGuiKey_GamepadDpadDown",
+        "name": "ImGuiKey_GamepadDpadUp",
         "value": "640"
       },
       {
         "calc_value": 641,
-        "name": "ImGuiKey_GamepadL1",
+        "name": "ImGuiKey_GamepadDpadDown",
         "value": "641"
       },
       {
         "calc_value": 642,
-        "name": "ImGuiKey_GamepadR1",
+        "name": "ImGuiKey_GamepadL1",
         "value": "642"
       },
       {
         "calc_value": 643,
-        "name": "ImGuiKey_GamepadL2",
+        "name": "ImGuiKey_GamepadR1",
         "value": "643"
       },
       {
         "calc_value": 644,
-        "name": "ImGuiKey_GamepadR2",
+        "name": "ImGuiKey_GamepadL2",
         "value": "644"
       },
       {
         "calc_value": 645,
-        "name": "ImGuiKey_GamepadL3",
+        "name": "ImGuiKey_GamepadR2",
         "value": "645"
       },
       {
         "calc_value": 646,
-        "name": "ImGuiKey_GamepadR3",
+        "name": "ImGuiKey_GamepadL3",
         "value": "646"
       },
       {
         "calc_value": 647,
-        "name": "ImGuiKey_GamepadLStickLeft",
+        "name": "ImGuiKey_GamepadR3",
         "value": "647"
       },
       {
         "calc_value": 648,
-        "name": "ImGuiKey_GamepadLStickRight",
+        "name": "ImGuiKey_GamepadLStickLeft",
         "value": "648"
       },
       {
         "calc_value": 649,
-        "name": "ImGuiKey_GamepadLStickUp",
+        "name": "ImGuiKey_GamepadLStickRight",
         "value": "649"
       },
       {
         "calc_value": 650,
-        "name": "ImGuiKey_GamepadLStickDown",
+        "name": "ImGuiKey_GamepadLStickUp",
         "value": "650"
       },
       {
         "calc_value": 651,
-        "name": "ImGuiKey_GamepadRStickLeft",
+        "name": "ImGuiKey_GamepadLStickDown",
         "value": "651"
       },
       {
         "calc_value": 652,
-        "name": "ImGuiKey_GamepadRStickRight",
+        "name": "ImGuiKey_GamepadRStickLeft",
         "value": "652"
       },
       {
         "calc_value": 653,
-        "name": "ImGuiKey_GamepadRStickUp",
+        "name": "ImGuiKey_GamepadRStickRight",
         "value": "653"
       },
       {
         "calc_value": 654,
-        "name": "ImGuiKey_GamepadRStickDown",
+        "name": "ImGuiKey_GamepadRStickUp",
         "value": "654"
       },
       {
         "calc_value": 655,
-        "name": "ImGuiKey_MouseLeft",
+        "name": "ImGuiKey_GamepadRStickDown",
         "value": "655"
       },
       {
         "calc_value": 656,
-        "name": "ImGuiKey_MouseRight",
+        "name": "ImGuiKey_MouseLeft",
         "value": "656"
       },
       {
         "calc_value": 657,
-        "name": "ImGuiKey_MouseMiddle",
+        "name": "ImGuiKey_MouseRight",
         "value": "657"
       },
       {
         "calc_value": 658,
-        "name": "ImGuiKey_MouseX1",
+        "name": "ImGuiKey_MouseMiddle",
         "value": "658"
       },
       {
         "calc_value": 659,
-        "name": "ImGuiKey_MouseX2",
+        "name": "ImGuiKey_MouseX1",
         "value": "659"
       },
       {
         "calc_value": 660,
-        "name": "ImGuiKey_MouseWheelX",
+        "name": "ImGuiKey_MouseX2",
         "value": "660"
       },
       {
         "calc_value": 661,
-        "name": "ImGuiKey_MouseWheelY",
+        "name": "ImGuiKey_MouseWheelX",
         "value": "661"
       },
       {
         "calc_value": 662,
-        "name": "ImGuiKey_ReservedForModCtrl",
+        "name": "ImGuiKey_MouseWheelY",
         "value": "662"
       },
       {
         "calc_value": 663,
-        "name": "ImGuiKey_ReservedForModShift",
+        "name": "ImGuiKey_ReservedForModCtrl",
         "value": "663"
       },
       {
         "calc_value": 664,
-        "name": "ImGuiKey_ReservedForModAlt",
+        "name": "ImGuiKey_ReservedForModShift",
         "value": "664"
       },
       {
         "calc_value": 665,
-        "name": "ImGuiKey_ReservedForModSuper",
+        "name": "ImGuiKey_ReservedForModAlt",
         "value": "665"
       },
       {
         "calc_value": 666,
-        "name": "ImGuiKey_NamedKey_END",
+        "name": "ImGuiKey_ReservedForModSuper",
         "value": "666"
+      },
+      {
+        "calc_value": 667,
+        "name": "ImGuiKey_NamedKey_END",
+        "value": "667"
+      },
+      {
+        "calc_value": 155,
+        "name": "ImGuiKey_NamedKey_COUNT",
+        "value": "ImGuiKey_NamedKey_END - ImGuiKey_NamedKey_BEGIN"
       },
       {
         "calc_value": 0,
@@ -2282,11 +2319,6 @@
         "calc_value": 61440,
         "name": "ImGuiMod_Mask_",
         "value": "0xF000"
-      },
-      {
-        "calc_value": 154,
-        "name": "ImGuiKey_NamedKey_COUNT",
-        "value": "ImGuiKey_NamedKey_END - ImGuiKey_NamedKey_BEGIN"
       }
     ],
     "ImGuiMouseButton_": [
@@ -2359,13 +2391,23 @@
       },
       {
         "calc_value": 8,
-        "name": "ImGuiMouseCursor_NotAllowed",
+        "name": "ImGuiMouseCursor_Wait",
         "value": "8"
       },
       {
         "calc_value": 9,
-        "name": "ImGuiMouseCursor_COUNT",
+        "name": "ImGuiMouseCursor_Progress",
         "value": "9"
+      },
+      {
+        "calc_value": 10,
+        "name": "ImGuiMouseCursor_NotAllowed",
+        "value": "10"
+      },
+      {
+        "calc_value": 11,
+        "name": "ImGuiMouseCursor_COUNT",
+        "value": "11"
       }
     ],
     "ImGuiMouseSource": [
@@ -2775,68 +2817,83 @@
       },
       {
         "calc_value": 22,
-        "name": "ImGuiStyleVar_TabRounding",
+        "name": "ImGuiStyleVar_ImageBorderSize",
         "value": "22"
       },
       {
         "calc_value": 23,
-        "name": "ImGuiStyleVar_TabBorderSize",
+        "name": "ImGuiStyleVar_TabRounding",
         "value": "23"
       },
       {
         "calc_value": 24,
-        "name": "ImGuiStyleVar_TabBarBorderSize",
+        "name": "ImGuiStyleVar_TabBorderSize",
         "value": "24"
       },
       {
         "calc_value": 25,
-        "name": "ImGuiStyleVar_TabBarOverlineSize",
+        "name": "ImGuiStyleVar_TabBarBorderSize",
         "value": "25"
       },
       {
         "calc_value": 26,
-        "name": "ImGuiStyleVar_TableAngledHeadersAngle",
+        "name": "ImGuiStyleVar_TabBarOverlineSize",
         "value": "26"
       },
       {
         "calc_value": 27,
-        "name": "ImGuiStyleVar_TableAngledHeadersTextAlign",
+        "name": "ImGuiStyleVar_TableAngledHeadersAngle",
         "value": "27"
       },
       {
         "calc_value": 28,
-        "name": "ImGuiStyleVar_ButtonTextAlign",
+        "name": "ImGuiStyleVar_TableAngledHeadersTextAlign",
         "value": "28"
       },
       {
         "calc_value": 29,
-        "name": "ImGuiStyleVar_SelectableTextAlign",
+        "name": "ImGuiStyleVar_TreeLinesSize",
         "value": "29"
       },
       {
         "calc_value": 30,
-        "name": "ImGuiStyleVar_SeparatorTextBorderSize",
+        "name": "ImGuiStyleVar_TreeLinesRounding",
         "value": "30"
       },
       {
         "calc_value": 31,
-        "name": "ImGuiStyleVar_SeparatorTextAlign",
+        "name": "ImGuiStyleVar_ButtonTextAlign",
         "value": "31"
       },
       {
         "calc_value": 32,
-        "name": "ImGuiStyleVar_SeparatorTextPadding",
+        "name": "ImGuiStyleVar_SelectableTextAlign",
         "value": "32"
       },
       {
         "calc_value": 33,
-        "name": "ImGuiStyleVar_DockingSeparatorSize",
+        "name": "ImGuiStyleVar_SeparatorTextBorderSize",
         "value": "33"
       },
       {
         "calc_value": 34,
-        "name": "ImGuiStyleVar_COUNT",
+        "name": "ImGuiStyleVar_SeparatorTextAlign",
         "value": "34"
+      },
+      {
+        "calc_value": 35,
+        "name": "ImGuiStyleVar_SeparatorTextPadding",
+        "value": "35"
+      },
+      {
+        "calc_value": 36,
+        "name": "ImGuiStyleVar_DockingSeparatorSize",
+        "value": "36"
+      },
+      {
+        "calc_value": 37,
+        "name": "ImGuiStyleVar_COUNT",
+        "value": "37"
       }
     ],
     "ImGuiTabBarFlags_": [
@@ -3404,13 +3461,28 @@
       },
       {
         "calc_value": 131072,
-        "name": "ImGuiTreeNodeFlags_NavLeftJumpsBackHere",
+        "name": "ImGuiTreeNodeFlags_NavLeftJumpsToParent",
         "value": "1 << 17"
       },
       {
         "calc_value": 26,
         "name": "ImGuiTreeNodeFlags_CollapsingHeader",
         "value": "ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_NoAutoOpenOnLog"
+      },
+      {
+        "calc_value": 262144,
+        "name": "ImGuiTreeNodeFlags_DrawLinesNone",
+        "value": "1 << 18"
+      },
+      {
+        "calc_value": 524288,
+        "name": "ImGuiTreeNodeFlags_DrawLinesFull",
+        "value": "1 << 19"
+      },
+      {
+        "calc_value": 1048576,
+        "name": "ImGuiTreeNodeFlags_DrawLinesToNodes",
+        "value": "1 << 20"
       }
     ],
     "ImGuiViewportFlags_": [
@@ -3641,6 +3713,45 @@
         "name": "ImGuiWindowFlags_ChildMenu",
         "value": "1 << 28"
       }
+    ],
+    "ImTextureFormat": [
+      {
+        "calc_value": 0,
+        "name": "ImTextureFormat_RGBA32",
+        "value": "0"
+      },
+      {
+        "calc_value": 1,
+        "name": "ImTextureFormat_Alpha8",
+        "value": "1"
+      }
+    ],
+    "ImTextureStatus": [
+      {
+        "calc_value": 0,
+        "name": "ImTextureStatus_OK",
+        "value": "0"
+      },
+      {
+        "calc_value": 1,
+        "name": "ImTextureStatus_Destroyed",
+        "value": "1"
+      },
+      {
+        "calc_value": 2,
+        "name": "ImTextureStatus_WantCreate",
+        "value": "2"
+      },
+      {
+        "calc_value": 3,
+        "name": "ImTextureStatus_WantUpdates",
+        "value": "3"
+      },
+      {
+        "calc_value": 4,
+        "name": "ImTextureStatus_WantDestroy",
+        "value": "4"
+      }
     ]
   },
   "enumtypes": {
@@ -3650,87 +3761,94 @@
     "ImGuiSortDirection": "ImU8"
   },
   "locations": {
-    "ImColor": "imgui:2883",
-    "ImDrawChannel": "imgui:3123",
-    "ImDrawCmd": "imgui:3080",
-    "ImDrawCmdHeader": "imgui:3115",
-    "ImDrawData": "imgui:3339",
-    "ImDrawFlags_": "imgui:3148",
-    "ImDrawList": "imgui:3186",
-    "ImDrawListFlags_": "imgui:3168",
-    "ImDrawListSplitter": "imgui:3131",
-    "ImDrawVert": "imgui:3100",
-    "ImFont": "imgui:3566",
-    "ImFontAtlas": "imgui:3462",
-    "ImFontAtlasCustomRect": "imgui:3421",
-    "ImFontAtlasFlags_": "imgui:3437",
-    "ImFontConfig": "imgui:3364",
-    "ImFontGlyph": "imgui:3394",
-    "ImFontGlyphRangesBuilder": "imgui:3406",
-    "ImGuiBackendFlags_": "imgui:1675",
-    "ImGuiButtonFlags_": "imgui:1809",
-    "ImGuiChildFlags_": "imgui:1158",
-    "ImGuiCol_": "imgui:1690",
-    "ImGuiColorEditFlags_": "imgui:1820",
-    "ImGuiComboFlags_": "imgui:1306",
-    "ImGuiCond_": "imgui:1932",
-    "ImGuiConfigFlags_": "imgui:1646",
-    "ImGuiDataType_": "imgui:1454",
-    "ImGuiDir": "imgui:1472",
-    "ImGuiDockNodeFlags_": "imgui:1407",
-    "ImGuiDragDropFlags_": "imgui:1426",
-    "ImGuiFocusedFlags_": "imgui:1353",
-    "ImGuiFreeTypeBuilderFlags": "imgui_freetype:26",
-    "ImGuiHoveredFlags_": "imgui:1367",
-    "ImGuiIO": "imgui:2305",
-    "ImGuiInputFlags_": "imgui:1623",
-    "ImGuiInputTextCallbackData": "imgui:2560",
-    "ImGuiInputTextFlags_": "imgui:1192",
-    "ImGuiItemFlags_": "imgui:1179",
-    "ImGuiKey": "imgui:1496",
-    "ImGuiKeyData": "imgui:2297",
-    "ImGuiListClipper": "imgui:2789",
-    "ImGuiMouseButton_": "imgui:1892",
-    "ImGuiMouseCursor_": "imgui:1902",
-    "ImGuiMouseSource": "imgui:1921",
-    "ImGuiMultiSelectFlags_": "imgui:2941",
-    "ImGuiMultiSelectIO": "imgui:2968",
-    "ImGuiOnceUponAFrame": "imgui:2660",
-    "ImGuiPayload": "imgui:2625",
-    "ImGuiPlatformIO": "imgui:3738",
-    "ImGuiPlatformImeData": "imgui:3844",
-    "ImGuiPlatformMonitor": "imgui:3834",
-    "ImGuiPopupFlags_": "imgui:1271",
-    "ImGuiSelectableFlags_": "imgui:1289",
-    "ImGuiSelectionBasicStorage": "imgui:3014",
-    "ImGuiSelectionExternalStorage": "imgui:3037",
-    "ImGuiSelectionRequest": "imgui:2988",
-    "ImGuiSelectionRequestType": "imgui:2980",
-    "ImGuiSizeCallbackData": "imgui:2594",
-    "ImGuiSliderFlags_": "imgui:1876",
-    "ImGuiSortDirection": "imgui:1483",
-    "ImGuiStorage": "imgui:2732",
-    "ImGuiStoragePair": "imgui:2715",
-    "ImGuiStyle": "imgui:2219",
-    "ImGuiStyleVar_": "imgui:1768",
-    "ImGuiTabBarFlags_": "imgui:1321",
-    "ImGuiTabItemFlags_": "imgui:1338",
-    "ImGuiTableBgTarget_": "imgui:2073",
-    "ImGuiTableColumnFlags_": "imgui:2020",
-    "ImGuiTableColumnSortSpecs": "imgui:2095",
-    "ImGuiTableFlags_": "imgui:1967",
-    "ImGuiTableRowFlags_": "imgui:2058",
-    "ImGuiTableSortSpecs": "imgui:2085",
-    "ImGuiTextBuffer": "imgui:2695",
-    "ImGuiTextFilter": "imgui:2668",
-    "ImGuiTextRange": "imgui:2678",
-    "ImGuiTreeNodeFlags_": "imgui:1234",
-    "ImGuiViewport": "imgui:3653",
-    "ImGuiViewportFlags_": "imgui:3625",
-    "ImGuiWindowClass": "imgui:2609",
-    "ImGuiWindowFlags_": "imgui:1107",
-    "ImVec2": "imgui:299",
-    "ImVec4": "imgui:312"
+    "ImColor": "imgui:3010",
+    "ImDrawChannel": "imgui:3258",
+    "ImDrawCmd": "imgui:3214",
+    "ImDrawCmdHeader": "imgui:3250",
+    "ImDrawData": "imgui:3479",
+    "ImDrawFlags_": "imgui:3283",
+    "ImDrawList": "imgui:3321",
+    "ImDrawListFlags_": "imgui:3303",
+    "ImDrawListSplitter": "imgui:3266",
+    "ImDrawVert": "imgui:3235",
+    "ImFont": "imgui:3894",
+    "ImFontAtlas": "imgui:3699",
+    "ImFontAtlasFlags_": "imgui:3672",
+    "ImFontAtlasRect": "imgui:3662",
+    "ImFontBaked": "imgui:3847",
+    "ImFontConfig": "imgui:3584",
+    "ImFontFlags_": "imgui:3881",
+    "ImFontGlyph": "imgui:3624",
+    "ImFontGlyphRangesBuilder": "imgui:3640",
+    "ImGuiBackendFlags_": "imgui:1756",
+    "ImGuiButtonFlags_": "imgui:1896",
+    "ImGuiChildFlags_": "imgui:1230",
+    "ImGuiCol_": "imgui:1772",
+    "ImGuiColorEditFlags_": "imgui:1907",
+    "ImGuiComboFlags_": "imgui:1385",
+    "ImGuiCond_": "imgui:2021",
+    "ImGuiConfigFlags_": "imgui:1727",
+    "ImGuiDataType_": "imgui:1533",
+    "ImGuiDir": "imgui:1551",
+    "ImGuiDockNodeFlags_": "imgui:1486",
+    "ImGuiDragDropFlags_": "imgui:1505",
+    "ImGuiFocusedFlags_": "imgui:1432",
+    "ImGuiFreeTypeLoaderFlags_": "imgui_freetype:29",
+    "ImGuiHoveredFlags_": "imgui:1446",
+    "ImGuiIO": "imgui:2418",
+    "ImGuiInputFlags_": "imgui:1704",
+    "ImGuiInputTextCallbackData": "imgui:2680",
+    "ImGuiInputTextFlags_": "imgui:1264",
+    "ImGuiItemFlags_": "imgui:1251",
+    "ImGuiKey": "imgui:1575",
+    "ImGuiKeyData": "imgui:2410",
+    "ImGuiListClipper": "imgui:2910",
+    "ImGuiMouseButton_": "imgui:1979",
+    "ImGuiMouseCursor_": "imgui:1989",
+    "ImGuiMouseSource": "imgui:2010",
+    "ImGuiMultiSelectFlags_": "imgui:3068",
+    "ImGuiMultiSelectIO": "imgui:3095",
+    "ImGuiOnceUponAFrame": "imgui:2780",
+    "ImGuiPayload": "imgui:2745",
+    "ImGuiPlatformIO": "imgui:4078",
+    "ImGuiPlatformImeData": "imgui:4193",
+    "ImGuiPlatformMonitor": "imgui:4183",
+    "ImGuiPopupFlags_": "imgui:1350",
+    "ImGuiSelectableFlags_": "imgui:1368",
+    "ImGuiSelectionBasicStorage": "imgui:3141",
+    "ImGuiSelectionExternalStorage": "imgui:3164",
+    "ImGuiSelectionRequest": "imgui:3115",
+    "ImGuiSelectionRequestType": "imgui:3107",
+    "ImGuiSizeCallbackData": "imgui:2714",
+    "ImGuiSliderFlags_": "imgui:1963",
+    "ImGuiSortDirection": "imgui:1562",
+    "ImGuiStorage": "imgui:2853",
+    "ImGuiStoragePair": "imgui:2836",
+    "ImGuiStyle": "imgui:2308",
+    "ImGuiStyleVar_": "imgui:1852",
+    "ImGuiTabBarFlags_": "imgui:1400",
+    "ImGuiTabItemFlags_": "imgui:1417",
+    "ImGuiTableBgTarget_": "imgui:2162",
+    "ImGuiTableColumnFlags_": "imgui:2109",
+    "ImGuiTableColumnSortSpecs": "imgui:2184",
+    "ImGuiTableFlags_": "imgui:2056",
+    "ImGuiTableRowFlags_": "imgui:2147",
+    "ImGuiTableSortSpecs": "imgui:2174",
+    "ImGuiTextBuffer": "imgui:2815",
+    "ImGuiTextFilter": "imgui:2788",
+    "ImGuiTextRange": "imgui:2798",
+    "ImGuiTreeNodeFlags_": "imgui:1306",
+    "ImGuiViewport": "imgui:3992",
+    "ImGuiViewportFlags_": "imgui:3964",
+    "ImGuiWindowClass": "imgui:2729",
+    "ImGuiWindowFlags_": "imgui:1179",
+    "ImTextureData": "imgui:3542",
+    "ImTextureFormat": "imgui:3510",
+    "ImTextureRect": "imgui:3529",
+    "ImTextureRef": "imgui:360",
+    "ImTextureStatus": "imgui:3517",
+    "ImVec2": "imgui:292",
+    "ImVec4": "imgui:305"
   },
   "nonPOD": {
     "ImColor": true,
@@ -3740,8 +3858,10 @@
     "ImDrawListSplitter": true,
     "ImFont": true,
     "ImFontAtlas": true,
-    "ImFontAtlasCustomRect": true,
+    "ImFontAtlasRect": true,
+    "ImFontBaked": true,
     "ImFontConfig": true,
+    "ImFontGlyph": true,
     "ImFontGlyphRangesBuilder": true,
     "ImGuiIO": true,
     "ImGuiInputTextCallbackData": true,
@@ -3762,6 +3882,8 @@
     "ImGuiTextRange": true,
     "ImGuiViewport": true,
     "ImGuiWindowClass": true,
+    "ImTextureData": true,
+    "ImTextureRef": true,
     "ImVec2": true,
     "ImVec4": true,
     "ImVector": true
@@ -3791,8 +3913,8 @@
         "type": "ImVec4"
       },
       {
-        "name": "TextureId",
-        "type": "ImTextureID"
+        "name": "TexRef",
+        "type": "ImTextureRef"
       },
       {
         "name": "VtxOffset",
@@ -3829,8 +3951,8 @@
         "type": "ImVec4"
       },
       {
-        "name": "TextureId",
-        "type": "ImTextureID"
+        "name": "TexRef",
+        "type": "ImTextureRef"
       },
       {
         "name": "VtxOffset",
@@ -3874,6 +3996,11 @@
       {
         "name": "OwnerViewport",
         "type": "ImGuiViewport*"
+      },
+      {
+        "name": "Textures",
+        "template_type": "ImTextureData*",
+        "type": "ImVector_ImTextureDataPtr*"
       }
     ],
     "ImDrawList": [
@@ -3931,9 +4058,9 @@
         "type": "ImVector_ImVec4"
       },
       {
-        "name": "_TextureIdStack",
-        "template_type": "ImTextureID",
-        "type": "ImVector_ImTextureID"
+        "name": "_TextureStack",
+        "template_type": "ImTextureRef",
+        "type": "ImVector_ImTextureRef"
       },
       {
         "name": "_CallbacksDataBuf",
@@ -3980,47 +4107,33 @@
     ],
     "ImFont": [
       {
-        "name": "IndexAdvanceX",
-        "template_type": "float",
-        "type": "ImVector_float"
-      },
-      {
-        "name": "FallbackAdvanceX",
-        "type": "float"
-      },
-      {
-        "name": "FontSize",
-        "type": "float"
-      },
-      {
-        "name": "IndexLookup",
-        "template_type": "ImU16",
-        "type": "ImVector_ImU16"
-      },
-      {
-        "name": "Glyphs",
-        "template_type": "ImFontGlyph",
-        "type": "ImVector_ImFontGlyph"
-      },
-      {
-        "name": "FallbackGlyph",
-        "type": "const ImFontGlyph*"
+        "name": "LastBaked",
+        "type": "ImFontBaked*"
       },
       {
         "name": "ContainerAtlas",
         "type": "ImFontAtlas*"
       },
       {
-        "name": "ConfigData",
-        "type": "const ImFontConfig*"
+        "name": "Flags",
+        "type": "ImFontFlags"
       },
       {
-        "name": "ConfigDataCount",
-        "type": "short"
+        "name": "CurrentRasterizerDensity",
+        "type": "float"
       },
       {
-        "name": "EllipsisCharCount",
-        "type": "short"
+        "name": "FontId",
+        "type": "ImGuiID"
+      },
+      {
+        "name": "LegacySize",
+        "type": "float"
+      },
+      {
+        "name": "Sources",
+        "template_type": "ImFontConfig*",
+        "type": "ImVector_ImFontConfigPtr"
       },
       {
         "name": "EllipsisChar",
@@ -4031,37 +4144,17 @@
         "type": "ImWchar"
       },
       {
-        "name": "EllipsisWidth",
-        "type": "float"
-      },
-      {
-        "name": "EllipsisCharStep",
-        "type": "float"
-      },
-      {
-        "name": "Scale",
-        "type": "float"
-      },
-      {
-        "name": "Ascent",
-        "type": "float"
-      },
-      {
-        "name": "Descent",
-        "type": "float"
-      },
-      {
-        "name": "MetricsTotalSurface",
-        "type": "int"
-      },
-      {
-        "name": "DirtyLookupTables",
-        "type": "bool"
-      },
-      {
         "name": "Used8kPagesMap[(0xFFFF+1)/8192/8]",
         "size": 1,
         "type": "ImU8"
+      },
+      {
+        "name": "EllipsisAutoBake",
+        "type": "bool"
+      },
+      {
+        "name": "RemapPairs",
+        "type": "ImGuiStorage"
       }
     ],
     "ImFontAtlas": [
@@ -4070,15 +4163,27 @@
         "type": "ImFontAtlasFlags"
       },
       {
-        "name": "TexID",
-        "type": "ImTextureID"
-      },
-      {
-        "name": "TexDesiredWidth",
-        "type": "int"
+        "name": "TexDesiredFormat",
+        "type": "ImTextureFormat"
       },
       {
         "name": "TexGlyphPadding",
+        "type": "int"
+      },
+      {
+        "name": "TexMinWidth",
+        "type": "int"
+      },
+      {
+        "name": "TexMinHeight",
+        "type": "int"
+      },
+      {
+        "name": "TexMaxWidth",
+        "type": "int"
+      },
+      {
+        "name": "TexMaxHeight",
         "type": "int"
       },
       {
@@ -4086,32 +4191,33 @@
         "type": "void*"
       },
       {
+        "name": "TexRef",
+        "type": "ImTextureRef"
+      },
+      {
+        "name": "TexData",
+        "type": "ImTextureData*"
+      },
+      {
+        "name": "TexList",
+        "template_type": "ImTextureData*",
+        "type": "ImVector_ImTextureDataPtr"
+      },
+      {
         "name": "Locked",
         "type": "bool"
       },
       {
-        "name": "TexReady",
+        "name": "RendererHasTextures",
+        "type": "bool"
+      },
+      {
+        "name": "TexIsBuilt",
         "type": "bool"
       },
       {
         "name": "TexPixelsUseColors",
         "type": "bool"
-      },
-      {
-        "name": "TexPixelsAlpha8",
-        "type": "unsigned char*"
-      },
-      {
-        "name": "TexPixelsRGBA32",
-        "type": "unsigned int*"
-      },
-      {
-        "name": "TexWidth",
-        "type": "int"
-      },
-      {
-        "name": "TexHeight",
-        "type": "int"
       },
       {
         "name": "TexUvScale",
@@ -4127,12 +4233,7 @@
         "type": "ImVector_ImFontPtr"
       },
       {
-        "name": "CustomRects",
-        "template_type": "ImFontAtlasCustomRect",
-        "type": "ImVector_ImFontAtlasCustomRect"
-      },
-      {
-        "name": "ConfigData",
+        "name": "Sources",
         "template_type": "ImFontConfig",
         "type": "ImVector_ImFontConfig"
       },
@@ -4142,63 +4243,151 @@
         "type": "ImVec4"
       },
       {
-        "name": "FontBuilderIO",
-        "type": "const ImFontBuilderIO*"
+        "name": "TexNextUniqueID",
+        "type": "int"
       },
       {
-        "name": "FontBuilderFlags",
+        "name": "FontNextUniqueID",
+        "type": "int"
+      },
+      {
+        "name": "DrawListSharedDatas",
+        "template_type": "ImDrawListSharedData*",
+        "type": "ImVector_ImDrawListSharedDataPtr"
+      },
+      {
+        "name": "Builder",
+        "type": "ImFontAtlasBuilder*"
+      },
+      {
+        "name": "FontLoader",
+        "type": "const ImFontLoader*"
+      },
+      {
+        "name": "FontLoaderName",
+        "type": "const char*"
+      },
+      {
+        "name": "FontLoaderData",
+        "type": "void*"
+      },
+      {
+        "name": "FontLoaderFlags",
         "type": "unsigned int"
       },
       {
-        "name": "PackIdMouseCursors",
+        "name": "RefCount",
         "type": "int"
       },
       {
-        "name": "PackIdLines",
-        "type": "int"
+        "name": "OwnerContext",
+        "type": "ImGuiContext*"
       }
     ],
-    "ImFontAtlasCustomRect": [
+    "ImFontAtlasRect": [
       {
-        "name": "X",
+        "name": "x",
         "type": "unsigned short"
       },
       {
-        "name": "Y",
+        "name": "y",
         "type": "unsigned short"
       },
       {
-        "name": "Width",
+        "name": "w",
         "type": "unsigned short"
       },
       {
-        "name": "Height",
+        "name": "h",
         "type": "unsigned short"
       },
       {
-        "bitfield": "31",
-        "name": "GlyphID",
+        "name": "uv0",
+        "type": "ImVec2"
+      },
+      {
+        "name": "uv1",
+        "type": "ImVec2"
+      }
+    ],
+    "ImFontBaked": [
+      {
+        "name": "IndexAdvanceX",
+        "template_type": "float",
+        "type": "ImVector_float"
+      },
+      {
+        "name": "FallbackAdvanceX",
+        "type": "float"
+      },
+      {
+        "name": "Size",
+        "type": "float"
+      },
+      {
+        "name": "RasterizerDensity",
+        "type": "float"
+      },
+      {
+        "name": "IndexLookup",
+        "template_type": "ImU16",
+        "type": "ImVector_ImU16"
+      },
+      {
+        "name": "Glyphs",
+        "template_type": "ImFontGlyph",
+        "type": "ImVector_ImFontGlyph"
+      },
+      {
+        "name": "FallbackGlyphIndex",
+        "type": "int"
+      },
+      {
+        "name": "Ascent",
+        "type": "float"
+      },
+      {
+        "name": "Descent",
+        "type": "float"
+      },
+      {
+        "bitfield": "26",
+        "name": "MetricsTotalSurface",
         "type": "unsigned int"
       },
       {
         "bitfield": "1",
-        "name": "GlyphColored",
+        "name": "WantDestroy",
         "type": "unsigned int"
       },
       {
-        "name": "GlyphAdvanceX",
-        "type": "float"
+        "bitfield": "1",
+        "name": "LockLoadingFallback",
+        "type": "unsigned int"
       },
       {
-        "name": "GlyphOffset",
-        "type": "ImVec2"
+        "name": "LastUsedFrame",
+        "type": "int"
       },
       {
-        "name": "Font",
+        "name": "BakedId",
+        "type": "ImGuiID"
+      },
+      {
+        "name": "ContainerFont",
         "type": "ImFont*"
+      },
+      {
+        "name": "FontLoaderDatas",
+        "type": "void*"
       }
     ],
     "ImFontConfig": [
+      {
+        "name": "Name[40]",
+        "size": 40,
+        "type": "char"
+      },
       {
         "name": "FontData",
         "type": "void*"
@@ -4220,32 +4409,36 @@
         "type": "bool"
       },
       {
+        "name": "PixelSnapV",
+        "type": "bool"
+      },
+      {
         "name": "FontNo",
-        "type": "int"
+        "type": "ImS8"
       },
       {
         "name": "OversampleH",
-        "type": "int"
+        "type": "ImS8"
       },
       {
         "name": "OversampleV",
-        "type": "int"
+        "type": "ImS8"
       },
       {
         "name": "SizePixels",
         "type": "float"
       },
       {
-        "name": "GlyphExtraSpacing",
-        "type": "ImVec2"
+        "name": "GlyphRanges",
+        "type": "const ImWchar*"
+      },
+      {
+        "name": "GlyphExcludeRanges",
+        "type": "const ImWchar*"
       },
       {
         "name": "GlyphOffset",
         "type": "ImVec2"
-      },
-      {
-        "name": "GlyphRanges",
-        "type": "const ImWchar*"
       },
       {
         "name": "GlyphMinAdvanceX",
@@ -4256,7 +4449,11 @@
         "type": "float"
       },
       {
-        "name": "FontBuilderFlags",
+        "name": "GlyphExtraAdvanceX",
+        "type": "float"
+      },
+      {
+        "name": "FontLoaderFlags",
         "type": "unsigned int"
       },
       {
@@ -4272,13 +4469,20 @@
         "type": "ImWchar"
       },
       {
-        "name": "Name[40]",
-        "size": 40,
-        "type": "char"
+        "name": "Flags",
+        "type": "ImFontFlags"
       },
       {
         "name": "DstFont",
         "type": "ImFont*"
+      },
+      {
+        "name": "FontLoader",
+        "type": "const ImFontLoader*"
+      },
+      {
+        "name": "FontLoaderData",
+        "type": "void*"
       }
     ],
     "ImFontGlyph": [
@@ -4293,7 +4497,12 @@
         "type": "unsigned int"
       },
       {
-        "bitfield": "30",
+        "bitfield": "4",
+        "name": "SourceIdx",
+        "type": "unsigned int"
+      },
+      {
+        "bitfield": "26",
         "name": "Codepoint",
         "type": "unsigned int"
       },
@@ -4332,6 +4541,10 @@
       {
         "name": "V1",
         "type": "float"
+      },
+      {
+        "name": "PackId",
+        "type": "int"
       }
     ],
     "ImFontGlyphRangesBuilder": [
@@ -4352,6 +4565,10 @@
       },
       {
         "name": "DisplaySize",
+        "type": "ImVec2"
+      },
+      {
+        "name": "DisplayFramebufferScale",
         "type": "ImVec2"
       },
       {
@@ -4379,20 +4596,12 @@
         "type": "ImFontAtlas*"
       },
       {
-        "name": "FontGlobalScale",
-        "type": "float"
-      },
-      {
-        "name": "FontAllowUserScaling",
-        "type": "bool"
-      },
-      {
         "name": "FontDefault",
         "type": "ImFont*"
       },
       {
-        "name": "DisplayFramebufferScale",
-        "type": "ImVec2"
+        "name": "FontAllowUserScaling",
+        "type": "bool"
       },
       {
         "name": "ConfigNavSwapGamepadButtons",
@@ -4452,6 +4661,14 @@
       },
       {
         "name": "ConfigViewportsNoDefaultParent",
+        "type": "bool"
+      },
+      {
+        "name": "ConfigDpiScaleFonts",
+        "type": "bool"
+      },
+      {
+        "name": "ConfigDpiScaleViewports",
         "type": "bool"
       },
       {
@@ -4540,6 +4757,10 @@
       },
       {
         "name": "ConfigDebugHighlightIdConflicts",
+        "type": "bool"
+      },
+      {
+        "name": "ConfigDebugHighlightIdConflictsShowItemPicker",
         "type": "bool"
       },
       {
@@ -4681,7 +4902,7 @@
       },
       {
         "name": "KeysData[ImGuiKey_NamedKey_COUNT]",
-        "size": 154,
+        "size": 155,
         "type": "ImGuiKeyData"
       },
       {
@@ -4887,7 +5108,7 @@
       },
       {
         "name": "StartPosY",
-        "type": "float"
+        "type": "double"
       },
       {
         "name": "StartSeekOffsetY",
@@ -5000,6 +5221,14 @@
         "type": "ImWchar"
       },
       {
+        "name": "Renderer_TextureMaxWidth",
+        "type": "int"
+      },
+      {
+        "name": "Renderer_TextureMaxHeight",
+        "type": "int"
+      },
+      {
         "name": "Renderer_RenderState",
         "type": "void*"
       },
@@ -5029,6 +5258,10 @@
       },
       {
         "name": "Platform_GetWindowSize",
+        "type": "ImVec2(*)(ImGuiViewport* vp)"
+      },
+      {
+        "name": "Platform_GetWindowFramebufferScale",
         "type": "ImVec2(*)(ImGuiViewport* vp)"
       },
       {
@@ -5105,6 +5338,11 @@
         "type": "ImVector_ImGuiPlatformMonitor"
       },
       {
+        "name": "Textures",
+        "template_type": "ImTextureData*",
+        "type": "ImVector_ImTextureDataPtr"
+      },
+      {
         "name": "Viewports",
         "template_type": "ImGuiViewport*",
         "type": "ImVector_ImGuiViewportPtr"
@@ -5116,12 +5354,20 @@
         "type": "bool"
       },
       {
+        "name": "WantTextInput",
+        "type": "bool"
+      },
+      {
         "name": "InputPos",
         "type": "ImVec2"
       },
       {
         "name": "InputLineHeight",
         "type": "float"
+      },
+      {
+        "name": "ViewportId",
+        "type": "ImGuiID"
       }
     ],
     "ImGuiPlatformMonitor": [
@@ -5245,6 +5491,18 @@
     ],
     "ImGuiStyle": [
       {
+        "name": "FontSizeBase",
+        "type": "float"
+      },
+      {
+        "name": "FontScaleMain",
+        "type": "float"
+      },
+      {
+        "name": "FontScaleDpi",
+        "type": "float"
+      },
+      {
         "name": "Alpha",
         "type": "float"
       },
@@ -5262,6 +5520,10 @@
       },
       {
         "name": "WindowBorderSize",
+        "type": "float"
+      },
+      {
+        "name": "WindowBorderHoverPadding",
         "type": "float"
       },
       {
@@ -5349,6 +5611,10 @@
         "type": "float"
       },
       {
+        "name": "ImageBorderSize",
+        "type": "float"
+      },
+      {
         "name": "TabRounding",
         "type": "float"
       },
@@ -5357,7 +5623,11 @@
         "type": "float"
       },
       {
-        "name": "TabMinWidthForCloseButton",
+        "name": "TabCloseButtonMinWidthSelected",
+        "type": "float"
+      },
+      {
+        "name": "TabCloseButtonMinWidthUnselected",
         "type": "float"
       },
       {
@@ -5375,6 +5645,18 @@
       {
         "name": "TableAngledHeadersTextAlign",
         "type": "ImVec2"
+      },
+      {
+        "name": "TreeLinesFlags",
+        "type": "ImGuiTreeNodeFlags"
+      },
+      {
+        "name": "TreeLinesSize",
+        "type": "float"
+      },
+      {
+        "name": "TreeLinesRounding",
+        "type": "float"
       },
       {
         "name": "ColorButtonPosition",
@@ -5438,7 +5720,7 @@
       },
       {
         "name": "Colors[ImGuiCol_COUNT]",
-        "size": 58,
+        "size": 60,
         "type": "ImVec4"
       },
       {
@@ -5460,6 +5742,14 @@
       {
         "name": "HoverFlagsForTooltipNav",
         "type": "ImGuiHoveredFlags"
+      },
+      {
+        "name": "_MainScale",
+        "type": "float"
+      },
+      {
+        "name": "_NextFrameFontSizeBase",
+        "type": "float"
       }
     ],
     "ImGuiTableColumnSortSpecs": [
@@ -5542,6 +5832,10 @@
       },
       {
         "name": "Size",
+        "type": "ImVec2"
+      },
+      {
+        "name": "FramebufferScale",
         "type": "ImVec2"
       },
       {
@@ -5635,6 +5929,101 @@
         "type": "bool"
       }
     ],
+    "ImTextureData": [
+      {
+        "name": "UniqueID",
+        "type": "int"
+      },
+      {
+        "name": "Status",
+        "type": "ImTextureStatus"
+      },
+      {
+        "name": "BackendUserData",
+        "type": "void*"
+      },
+      {
+        "name": "TexID",
+        "type": "ImTextureID"
+      },
+      {
+        "name": "Format",
+        "type": "ImTextureFormat"
+      },
+      {
+        "name": "Width",
+        "type": "int"
+      },
+      {
+        "name": "Height",
+        "type": "int"
+      },
+      {
+        "name": "BytesPerPixel",
+        "type": "int"
+      },
+      {
+        "name": "Pixels",
+        "type": "unsigned char*"
+      },
+      {
+        "name": "UsedRect",
+        "type": "ImTextureRect"
+      },
+      {
+        "name": "UpdateRect",
+        "type": "ImTextureRect"
+      },
+      {
+        "name": "Updates",
+        "template_type": "ImTextureRect",
+        "type": "ImVector_ImTextureRect"
+      },
+      {
+        "name": "UnusedFrames",
+        "type": "int"
+      },
+      {
+        "name": "RefCount",
+        "type": "unsigned short"
+      },
+      {
+        "name": "UseColors",
+        "type": "bool"
+      },
+      {
+        "name": "WantDestroyNextFrame",
+        "type": "bool"
+      }
+    ],
+    "ImTextureRect": [
+      {
+        "name": "x",
+        "type": "unsigned short"
+      },
+      {
+        "name": "y",
+        "type": "unsigned short"
+      },
+      {
+        "name": "w",
+        "type": "unsigned short"
+      },
+      {
+        "name": "h",
+        "type": "unsigned short"
+      }
+    ],
+    "ImTextureRef": [
+      {
+        "name": "_TexData",
+        "type": "ImTextureData*"
+      },
+      {
+        "name": "_TexID",
+        "type": "ImTextureID"
+      }
+    ],
     "ImVec2": [
       {
         "name": "x",
@@ -5686,17 +6075,20 @@
       "ImDrawCmd": true,
       "ImDrawIdx": true,
       "ImDrawList*": true,
+      "ImDrawListSharedData*": true,
       "ImDrawVert": true,
       "ImFont*": true,
-      "ImFontAtlasCustomRect": true,
       "ImFontConfig": true,
+      "ImFontConfig*": true,
       "ImFontGlyph": true,
       "ImGuiPlatformMonitor": true,
       "ImGuiSelectionRequest": true,
       "ImGuiStoragePair": true,
       "ImGuiTextRange": true,
       "ImGuiViewport*": true,
-      "ImTextureID": true,
+      "ImTextureData*": true,
+      "ImTextureRect": true,
+      "ImTextureRef": true,
       "ImU16": true,
       "ImU32": true,
       "ImU8": true,

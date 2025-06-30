@@ -17,10 +17,15 @@ struct ImDrawListSplitter;
 struct ImDrawVert;
 struct ImFont;
 struct ImFontAtlas;
-struct ImFontBuilderIO;
+struct ImFontAtlasBuilder;
+struct ImFontAtlasRect;
+struct ImFontBaked;
 struct ImFontConfig;
 struct ImFontGlyph;
 struct ImFontGlyphRangesBuilder;
+struct ImFontLoader;
+struct ImTextureData;
+struct ImTextureRect;
 struct ImColor;
 struct ImGuiContext;
 struct ImGuiIO;
@@ -59,6 +64,7 @@ typedef int ImGuiStyleVar;
 typedef int ImGuiTableBgTarget;
 typedef int ImDrawFlags;
 typedef int ImDrawListFlags;
+typedef int ImFontFlags;
 typedef int ImFontAtlasFlags;
 typedef int ImGuiBackendFlags;
 typedef int ImGuiButtonFlags;
@@ -86,8 +92,6 @@ typedef int ImGuiTableRowFlags;
 typedef int ImGuiTreeNodeFlags;
 typedef int ImGuiViewportFlags;
 typedef int ImGuiWindowFlags;
-typedef ImU64 ImTextureID;
-typedef unsigned short ImDrawIdx;
 typedef unsigned int ImWchar32;
 typedef unsigned short ImWchar16;
 typedef ImWchar16 ImWchar;
@@ -101,14 +105,23 @@ struct ImVec2
     float x, y;
     constexpr ImVec2() : x(0.0f), y(0.0f) { }
     constexpr ImVec2(float _x, float _y) : x(_x), y(_y) { }
-    float& operator[] (size_t idx) {                                              ((void) sizeof ((                                             idx == 0 || idx == 1                                             ) ? 1 : 0), __extension__ ({ if (                                             idx == 0 || idx == 1                                             ) ; else __assert_fail (                                             "idx == 0 || idx == 1"                                             , "../imgui/imgui.h", 304, __extension__ __PRETTY_FUNCTION__); }))                                                                            ; return ((float*)(void*)(char*)this)[idx]; }
-    float operator[] (size_t idx) const {                                              ((void) sizeof ((                                             idx == 0 || idx == 1                                             ) ? 1 : 0), __extension__ ({ if (                                             idx == 0 || idx == 1                                             ) ; else __assert_fail (                                             "idx == 0 || idx == 1"                                             , "../imgui/imgui.h", 305, __extension__ __PRETTY_FUNCTION__); }))                                                                            ; return ((const float*)(const void*)(const char*)this)[idx]; }
+    float& operator[] (size_t idx) {                                              ((void) sizeof ((                                             idx == 0 || idx == 1                                             ) ? 1 : 0), __extension__ ({ if (                                             idx == 0 || idx == 1                                             ) ; else __assert_fail (                                             "idx == 0 || idx == 1"                                             , "../imgui/imgui.h", 297, __extension__ __PRETTY_FUNCTION__); }))                                                                            ; return ((float*)(void*)(char*)this)[idx]; }
+    float operator[] (size_t idx) const {                                              ((void) sizeof ((                                             idx == 0 || idx == 1                                             ) ? 1 : 0), __extension__ ({ if (                                             idx == 0 || idx == 1                                             ) ; else __assert_fail (                                             "idx == 0 || idx == 1"                                             , "../imgui/imgui.h", 298, __extension__ __PRETTY_FUNCTION__); }))                                                                            ; return ((const float*)(const void*)(const char*)this)[idx]; }
 };
 struct ImVec4
 {
     float x, y, z, w;
     constexpr ImVec4() : x(0.0f), y(0.0f), z(0.0f), w(0.0f) { }
     constexpr ImVec4(float _x, float _y, float _z, float _w) : x(_x), y(_y), z(_z), w(_w) { }
+};
+typedef ImU64 ImTextureID;
+struct ImTextureRef
+{
+    ImTextureRef() { _TexData =                                                         ((void *)0)                                                            ; _TexID = ((ImTextureID)0); }
+    ImTextureRef(ImTextureID tex_id) { _TexData =                                                         ((void *)0)                                                            ; _TexID = tex_id; }
+    inline ImTextureID GetTexID() const;
+    ImTextureData* _TexData;
+    ImTextureID _TexID;
 };
 namespace ImGui
 {
@@ -165,7 +178,6 @@ namespace ImGui
     void SetWindowSize(const ImVec2& size, ImGuiCond cond = 0);
     void SetWindowCollapsed(bool collapsed, ImGuiCond cond = 0);
     void SetWindowFocus();
-    void SetWindowFontScale(float scale);
     void SetWindowPos(const char* name, const ImVec2& pos, ImGuiCond cond = 0);
     void SetWindowSize(const char* name, const ImVec2& size, ImGuiCond cond = 0);
     void SetWindowCollapsed(const char* name, bool collapsed, ImGuiCond cond = 0);
@@ -180,8 +192,11 @@ namespace ImGui
     void SetScrollHereY(float center_y_ratio = 0.5f);
     void SetScrollFromPosX(float local_x, float center_x_ratio = 0.5f);
     void SetScrollFromPosY(float local_y, float center_y_ratio = 0.5f);
-    void PushFont(ImFont* font);
+    void PushFont(ImFont* font, float font_size_base_unscaled);
     void PopFont();
+    ImFont* GetFont();
+    float GetFontSize();
+    ImFontBaked* GetFontBaked();
     void PushStyleColor(ImGuiCol idx, ImU32 col);
     void PushStyleColor(ImGuiCol idx, const ImVec4& col);
     void PopStyleColor(int count = 1);
@@ -198,8 +213,6 @@ namespace ImGui
     float CalcItemWidth();
     void PushTextWrapPos(float wrap_local_pos_x = 0.0f);
     void PopTextWrapPos();
-    ImFont* GetFont();
-    float GetFontSize();
     ImVec2 GetFontTexUvWhitePixel();
     ImU32 GetColorU32(ImGuiCol idx, float alpha_mul = 1.0f);
     ImU32 GetColorU32(const ImVec4& col);
@@ -264,9 +277,10 @@ namespace ImGui
     void ProgressBar(float fraction, const ImVec2& size_arg = ImVec2(-1.17549435082228750796873653722224568e-38F                                                                                               , 0), const char* overlay =                                                                                                                            ((void *)0)                                                                                                                               );
     void Bullet();
     bool TextLink(const char* label);
-    void TextLinkOpenURL(const char* label, const char* url =                                                                                 ((void *)0)                                                                                    );
-    void Image(ImTextureID user_texture_id, const ImVec2& image_size, const ImVec2& uv0 = ImVec2(0, 0), const ImVec2& uv1 = ImVec2(1, 1), const ImVec4& tint_col = ImVec4(1, 1, 1, 1), const ImVec4& border_col = ImVec4(0, 0, 0, 0));
-    bool ImageButton(const char* str_id, ImTextureID user_texture_id, const ImVec2& image_size, const ImVec2& uv0 = ImVec2(0, 0), const ImVec2& uv1 = ImVec2(1, 1), const ImVec4& bg_col = ImVec4(0, 0, 0, 0), const ImVec4& tint_col = ImVec4(1, 1, 1, 1));
+    bool TextLinkOpenURL(const char* label, const char* url =                                                                                 ((void *)0)                                                                                    );
+    void Image(ImTextureRef tex_ref, const ImVec2& image_size, const ImVec2& uv0 = ImVec2(0, 0), const ImVec2& uv1 = ImVec2(1, 1));
+    void ImageWithBg(ImTextureRef tex_ref, const ImVec2& image_size, const ImVec2& uv0 = ImVec2(0, 0), const ImVec2& uv1 = ImVec2(1, 1), const ImVec4& bg_col = ImVec4(0, 0, 0, 0), const ImVec4& tint_col = ImVec4(1, 1, 1, 1));
+    bool ImageButton(const char* str_id, ImTextureRef tex_ref, const ImVec2& image_size, const ImVec2& uv0 = ImVec2(0, 0), const ImVec2& uv1 = ImVec2(1, 1), const ImVec4& bg_col = ImVec4(0, 0, 0, 0), const ImVec4& tint_col = ImVec4(1, 1, 1, 1));
     bool BeginCombo(const char* label, const char* preview_value, ImGuiComboFlags flags = 0);
     void EndCombo();
     bool Combo(const char* label, int* current_item, const char* const items[], int items_count, int popup_max_height_in_items = -1);
@@ -518,7 +532,7 @@ namespace ImGui
     void* MemAlloc(size_t size);
     void MemFree(void* ptr);
     void UpdatePlatformWindows();
-    void RenderPlatformWindowsDefault(void* platform_render_arg =                                                                                         ((void *)0)                                                                                            , void* renderer_render_arg =                                                                                                                           ((void *)0)                                                                                                                              );
+    void RenderPlatformWindowsDefault(void* platform_render_arg =                                                                                     ((void *)0)                                                                                        , void* renderer_render_arg =                                                                                                                       ((void *)0)                                                                                                                          );
     void DestroyPlatformWindows();
     ImGuiViewport* FindViewportByID(ImGuiID id);
     ImGuiViewport* FindViewportByPlatformHandle(void* platform_handle);
@@ -626,8 +640,11 @@ enum ImGuiTreeNodeFlags_
     ImGuiTreeNodeFlags_SpanLabelWidth = 1 << 13,
     ImGuiTreeNodeFlags_SpanAllColumns = 1 << 14,
     ImGuiTreeNodeFlags_LabelSpanAllColumns = 1 << 15,
-    ImGuiTreeNodeFlags_NavLeftJumpsBackHere = 1 << 17,
+    ImGuiTreeNodeFlags_NavLeftJumpsToParent = 1 << 17,
     ImGuiTreeNodeFlags_CollapsingHeader = ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_NoAutoOpenOnLog,
+    ImGuiTreeNodeFlags_DrawLinesNone = 1 << 18,
+    ImGuiTreeNodeFlags_DrawLinesFull = 1 << 19,
+    ImGuiTreeNodeFlags_DrawLinesToNodes = 1 << 20,
 };
 enum ImGuiPopupFlags_
 {
@@ -844,6 +861,7 @@ enum ImGuiKey : int
     ImGuiKey_KeypadEqual,
     ImGuiKey_AppBack,
     ImGuiKey_AppForward,
+    ImGuiKey_Oem102,
     ImGuiKey_GamepadStart,
     ImGuiKey_GamepadBack,
     ImGuiKey_GamepadFaceLeft,
@@ -871,13 +889,13 @@ enum ImGuiKey : int
     ImGuiKey_MouseLeft, ImGuiKey_MouseRight, ImGuiKey_MouseMiddle, ImGuiKey_MouseX1, ImGuiKey_MouseX2, ImGuiKey_MouseWheelX, ImGuiKey_MouseWheelY,
     ImGuiKey_ReservedForModCtrl, ImGuiKey_ReservedForModShift, ImGuiKey_ReservedForModAlt, ImGuiKey_ReservedForModSuper,
     ImGuiKey_NamedKey_END,
+    ImGuiKey_NamedKey_COUNT = ImGuiKey_NamedKey_END - ImGuiKey_NamedKey_BEGIN,
     ImGuiMod_None = 0,
     ImGuiMod_Ctrl = 1 << 12,
     ImGuiMod_Shift = 1 << 13,
     ImGuiMod_Alt = 1 << 14,
     ImGuiMod_Super = 1 << 15,
     ImGuiMod_Mask_ = 0xF000,
-    ImGuiKey_NamedKey_COUNT = ImGuiKey_NamedKey_END - ImGuiKey_NamedKey_BEGIN,
 };
 enum ImGuiInputFlags_
 {
@@ -903,8 +921,6 @@ enum ImGuiConfigFlags_
     ImGuiConfigFlags_NoKeyboard = 1 << 6,
     ImGuiConfigFlags_DockingEnable = 1 << 7,
     ImGuiConfigFlags_ViewportsEnable = 1 << 10,
-    ImGuiConfigFlags_DpiEnableScaleViewports= 1 << 14,
-    ImGuiConfigFlags_DpiEnableScaleFonts = 1 << 15,
     ImGuiConfigFlags_IsSRGB = 1 << 20,
     ImGuiConfigFlags_IsTouchScreen = 1 << 21,
 };
@@ -915,6 +931,7 @@ enum ImGuiBackendFlags_
     ImGuiBackendFlags_HasMouseCursors = 1 << 1,
     ImGuiBackendFlags_HasSetMousePos = 1 << 2,
     ImGuiBackendFlags_RendererHasVtxOffset = 1 << 3,
+    ImGuiBackendFlags_RendererHasTextures = 1 << 4,
     ImGuiBackendFlags_PlatformHasViewports = 1 << 10,
     ImGuiBackendFlags_HasMouseHoveredViewport=1 << 11,
     ImGuiBackendFlags_RendererHasViewports = 1 << 12,
@@ -954,6 +971,7 @@ enum ImGuiCol_
     ImGuiCol_ResizeGrip,
     ImGuiCol_ResizeGripHovered,
     ImGuiCol_ResizeGripActive,
+    ImGuiCol_InputTextCursor,
     ImGuiCol_TabHovered,
     ImGuiCol_Tab,
     ImGuiCol_TabSelected,
@@ -974,6 +992,7 @@ enum ImGuiCol_
     ImGuiCol_TableRowBgAlt,
     ImGuiCol_TextLink,
     ImGuiCol_TextSelectedBg,
+    ImGuiCol_TreeLines,
     ImGuiCol_DragDropTarget,
     ImGuiCol_NavCursor,
     ImGuiCol_NavWindowingHighlight,
@@ -1005,12 +1024,15 @@ enum ImGuiStyleVar_
     ImGuiStyleVar_ScrollbarRounding,
     ImGuiStyleVar_GrabMinSize,
     ImGuiStyleVar_GrabRounding,
+    ImGuiStyleVar_ImageBorderSize,
     ImGuiStyleVar_TabRounding,
     ImGuiStyleVar_TabBorderSize,
     ImGuiStyleVar_TabBarBorderSize,
     ImGuiStyleVar_TabBarOverlineSize,
     ImGuiStyleVar_TableAngledHeadersAngle,
     ImGuiStyleVar_TableAngledHeadersTextAlign,
+    ImGuiStyleVar_TreeLinesSize,
+    ImGuiStyleVar_TreeLinesRounding,
     ImGuiStyleVar_ButtonTextAlign,
     ImGuiStyleVar_SelectableTextAlign,
     ImGuiStyleVar_SeparatorTextBorderSize,
@@ -1093,6 +1115,8 @@ enum ImGuiMouseCursor_
     ImGuiMouseCursor_ResizeNESW,
     ImGuiMouseCursor_ResizeNWSE,
     ImGuiMouseCursor_Hand,
+    ImGuiMouseCursor_Wait,
+    ImGuiMouseCursor_Progress,
     ImGuiMouseCursor_NotAllowed,
     ImGuiMouseCursor_COUNT
 };
@@ -1234,45 +1258,49 @@ struct ImVector
     inline int size_in_bytes() const { return Size * (int)sizeof(T); }
     inline int max_size() const { return 0x7FFFFFFF / (int)sizeof(T); }
     inline int capacity() const { return Capacity; }
-    inline T& operator[](int i) {                                                              ((void) sizeof ((                                                             i >= 0 && i < Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             i >= 0 && i < Size                                                             ) ; else __assert_fail (                                                             "i >= 0 && i < Size"                                                             , "../imgui/imgui.h", 2173, __extension__ __PRETTY_FUNCTION__); }))                                                                                          ; return Data[i]; }
-    inline const T& operator[](int i) const {                                                              ((void) sizeof ((                                                             i >= 0 && i < Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             i >= 0 && i < Size                                                             ) ; else __assert_fail (                                                             "i >= 0 && i < Size"                                                             , "../imgui/imgui.h", 2174, __extension__ __PRETTY_FUNCTION__); }))                                                                                          ; return Data[i]; }
+    inline T& operator[](int i) {                                                              ((void) sizeof ((                                                             i >= 0 && i < Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             i >= 0 && i < Size                                                             ) ; else __assert_fail (                                                             "i >= 0 && i < Size"                                                             , "../imgui/imgui.h", 2262, __extension__ __PRETTY_FUNCTION__); }))                                                                                          ; return Data[i]; }
+    inline const T& operator[](int i) const {                                                              ((void) sizeof ((                                                             i >= 0 && i < Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             i >= 0 && i < Size                                                             ) ; else __assert_fail (                                                             "i >= 0 && i < Size"                                                             , "../imgui/imgui.h", 2263, __extension__ __PRETTY_FUNCTION__); }))                                                                                          ; return Data[i]; }
     inline T* begin() { return Data; }
     inline const T* begin() const { return Data; }
     inline T* end() { return Data + Size; }
     inline const T* end() const { return Data + Size; }
-    inline T& front() {                                                              ((void) sizeof ((                                                             Size > 0                                                             ) ? 1 : 0), __extension__ ({ if (                                                             Size > 0                                                             ) ; else __assert_fail (                                                             "Size > 0"                                                             , "../imgui/imgui.h", 2180, __extension__ __PRETTY_FUNCTION__); }))                                                                                ; return Data[0]; }
-    inline const T& front() const {                                                              ((void) sizeof ((                                                             Size > 0                                                             ) ? 1 : 0), __extension__ ({ if (                                                             Size > 0                                                             ) ; else __assert_fail (                                                             "Size > 0"                                                             , "../imgui/imgui.h", 2181, __extension__ __PRETTY_FUNCTION__); }))                                                                                ; return Data[0]; }
-    inline T& back() {                                                              ((void) sizeof ((                                                             Size > 0                                                             ) ? 1 : 0), __extension__ ({ if (                                                             Size > 0                                                             ) ; else __assert_fail (                                                             "Size > 0"                                                             , "../imgui/imgui.h", 2182, __extension__ __PRETTY_FUNCTION__); }))                                                                                ; return Data[Size - 1]; }
-    inline const T& back() const {                                                              ((void) sizeof ((                                                             Size > 0                                                             ) ? 1 : 0), __extension__ ({ if (                                                             Size > 0                                                             ) ; else __assert_fail (                                                             "Size > 0"                                                             , "../imgui/imgui.h", 2183, __extension__ __PRETTY_FUNCTION__); }))                                                                                ; return Data[Size - 1]; }
+    inline T& front() {                                                              ((void) sizeof ((                                                             Size > 0                                                             ) ? 1 : 0), __extension__ ({ if (                                                             Size > 0                                                             ) ; else __assert_fail (                                                             "Size > 0"                                                             , "../imgui/imgui.h", 2269, __extension__ __PRETTY_FUNCTION__); }))                                                                                ; return Data[0]; }
+    inline const T& front() const {                                                              ((void) sizeof ((                                                             Size > 0                                                             ) ? 1 : 0), __extension__ ({ if (                                                             Size > 0                                                             ) ; else __assert_fail (                                                             "Size > 0"                                                             , "../imgui/imgui.h", 2270, __extension__ __PRETTY_FUNCTION__); }))                                                                                ; return Data[0]; }
+    inline T& back() {                                                              ((void) sizeof ((                                                             Size > 0                                                             ) ? 1 : 0), __extension__ ({ if (                                                             Size > 0                                                             ) ; else __assert_fail (                                                             "Size > 0"                                                             , "../imgui/imgui.h", 2271, __extension__ __PRETTY_FUNCTION__); }))                                                                                ; return Data[Size - 1]; }
+    inline const T& back() const {                                                              ((void) sizeof ((                                                             Size > 0                                                             ) ? 1 : 0), __extension__ ({ if (                                                             Size > 0                                                             ) ; else __assert_fail (                                                             "Size > 0"                                                             , "../imgui/imgui.h", 2272, __extension__ __PRETTY_FUNCTION__); }))                                                                                ; return Data[Size - 1]; }
     inline void swap(ImVector<T>& rhs) { int rhs_size = rhs.Size; rhs.Size = Size; Size = rhs_size; int rhs_cap = rhs.Capacity; rhs.Capacity = Capacity; Capacity = rhs_cap; T* rhs_data = rhs.Data; rhs.Data = Data; Data = rhs_data; }
     inline int _grow_capacity(int sz) const { int new_capacity = Capacity ? (Capacity + Capacity / 2) : 8; return new_capacity > sz ? new_capacity : sz; }
     inline void resize(int new_size) { if (new_size > Capacity) reserve(_grow_capacity(new_size)); Size = new_size; }
     inline void resize(int new_size, const T& v) { if (new_size > Capacity) reserve(_grow_capacity(new_size)); if (new_size > Size) for (int n = Size; n < new_size; n++) memcpy(&Data[n], &v, sizeof(v)); Size = new_size; }
-    inline void shrink(int new_size) {                                                              ((void) sizeof ((                                                             new_size <= Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             new_size <= Size                                                             ) ; else __assert_fail (                                                             "new_size <= Size"                                                             , "../imgui/imgui.h", 2189, __extension__ __PRETTY_FUNCTION__); }))                                                                                        ; Size = new_size; }
+    inline void shrink(int new_size) {                                                              ((void) sizeof ((                                                             new_size <= Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             new_size <= Size                                                             ) ; else __assert_fail (                                                             "new_size <= Size"                                                             , "../imgui/imgui.h", 2278, __extension__ __PRETTY_FUNCTION__); }))                                                                                        ; Size = new_size; }
     inline void reserve(int new_capacity) { if (new_capacity <= Capacity) return; T* new_data = (T*)ImGui::MemAlloc((size_t)new_capacity * sizeof(T)); if (Data) { memcpy(new_data, Data, (size_t)Size * sizeof(T)); ImGui::MemFree(Data); } Data = new_data; Capacity = new_capacity; }
     inline void reserve_discard(int new_capacity) { if (new_capacity <= Capacity) return; if (Data) ImGui::MemFree(Data); Data = (T*)ImGui::MemAlloc((size_t)new_capacity * sizeof(T)); Capacity = new_capacity; }
     inline void push_back(const T& v) { if (Size == Capacity) reserve(_grow_capacity(Size + 1)); memcpy(&Data[Size], &v, sizeof(v)); Size++; }
-    inline void pop_back() {                                                              ((void) sizeof ((                                                             Size > 0                                                             ) ? 1 : 0), __extension__ ({ if (                                                             Size > 0                                                             ) ; else __assert_fail (                                                             "Size > 0"                                                             , "../imgui/imgui.h", 2195, __extension__ __PRETTY_FUNCTION__); }))                                                                                ; Size--; }
+    inline void pop_back() {                                                              ((void) sizeof ((                                                             Size > 0                                                             ) ? 1 : 0), __extension__ ({ if (                                                             Size > 0                                                             ) ; else __assert_fail (                                                             "Size > 0"                                                             , "../imgui/imgui.h", 2284, __extension__ __PRETTY_FUNCTION__); }))                                                                                ; Size--; }
     inline void push_front(const T& v) { if (Size == 0) push_back(v); else insert(Data, v); }
-    inline T* erase(const T* it) {                                                              ((void) sizeof ((                                                             it >= Data && it < Data + Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             it >= Data && it < Data + Size                                                             ) ; else __assert_fail (                                                             "it >= Data && it < Data + Size"                                                             , "../imgui/imgui.h", 2197, __extension__ __PRETTY_FUNCTION__); }))                                                                                                      ; const ptrdiff_t off = it - Data; memmove(Data + off, Data + off + 1, ((size_t)Size - (size_t)off - 1) * sizeof(T)); Size--; return Data + off; }
-    inline T* erase(const T* it, const T* it_last){                                                              ((void) sizeof ((                                                             it >= Data && it < Data + Size && it_last >= it && it_last <= Data + Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             it >= Data && it < Data + Size && it_last >= it && it_last <= Data + Size                                                             ) ; else __assert_fail (                                                             "it >= Data && it < Data + Size && it_last >= it && it_last <= Data + Size"                                                             , "../imgui/imgui.h", 2198, __extension__ __PRETTY_FUNCTION__); }))                                                                                                                                                 ; const ptrdiff_t count = it_last - it; const ptrdiff_t off = it - Data; memmove(Data + off, Data + off + count, ((size_t)Size - (size_t)off - (size_t)count) * sizeof(T)); Size -= (int)count; return Data + off; }
-    inline T* erase_unsorted(const T* it) {                                                              ((void) sizeof ((                                                             it >= Data && it < Data + Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             it >= Data && it < Data + Size                                                             ) ; else __assert_fail (                                                             "it >= Data && it < Data + Size"                                                             , "../imgui/imgui.h", 2199, __extension__ __PRETTY_FUNCTION__); }))                                                                                                      ; const ptrdiff_t off = it - Data; if (it < Data + Size - 1) memcpy(Data + off, Data + Size - 1, sizeof(T)); Size--; return Data + off; }
-    inline T* insert(const T* it, const T& v) {                                                              ((void) sizeof ((                                                             it >= Data && it <= Data + Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             it >= Data && it <= Data + Size                                                             ) ; else __assert_fail (                                                             "it >= Data && it <= Data + Size"                                                             , "../imgui/imgui.h", 2200, __extension__ __PRETTY_FUNCTION__); }))                                                                                                       ; const ptrdiff_t off = it - Data; if (Size == Capacity) reserve(_grow_capacity(Size + 1)); if (off < (int)Size) memmove(Data + off + 1, Data + off, ((size_t)Size - (size_t)off) * sizeof(T)); memcpy(&Data[off], &v, sizeof(v)); Size++; return Data + off; }
+    inline T* erase(const T* it) {                                                              ((void) sizeof ((                                                             it >= Data && it < Data + Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             it >= Data && it < Data + Size                                                             ) ; else __assert_fail (                                                             "it >= Data && it < Data + Size"                                                             , "../imgui/imgui.h", 2286, __extension__ __PRETTY_FUNCTION__); }))                                                                                                      ; const ptrdiff_t off = it - Data; memmove(Data + off, Data + off + 1, ((size_t)Size - (size_t)off - 1) * sizeof(T)); Size--; return Data + off; }
+    inline T* erase(const T* it, const T* it_last){                                                              ((void) sizeof ((                                                             it >= Data && it < Data + Size && it_last >= it && it_last <= Data + Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             it >= Data && it < Data + Size && it_last >= it && it_last <= Data + Size                                                             ) ; else __assert_fail (                                                             "it >= Data && it < Data + Size && it_last >= it && it_last <= Data + Size"                                                             , "../imgui/imgui.h", 2287, __extension__ __PRETTY_FUNCTION__); }))                                                                                                                                                 ; const ptrdiff_t count = it_last - it; const ptrdiff_t off = it - Data; memmove(Data + off, Data + off + count, ((size_t)Size - (size_t)off - (size_t)count) * sizeof(T)); Size -= (int)count; return Data + off; }
+    inline T* erase_unsorted(const T* it) {                                                              ((void) sizeof ((                                                             it >= Data && it < Data + Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             it >= Data && it < Data + Size                                                             ) ; else __assert_fail (                                                             "it >= Data && it < Data + Size"                                                             , "../imgui/imgui.h", 2288, __extension__ __PRETTY_FUNCTION__); }))                                                                                                      ; const ptrdiff_t off = it - Data; if (it < Data + Size - 1) memcpy(Data + off, Data + Size - 1, sizeof(T)); Size--; return Data + off; }
+    inline T* insert(const T* it, const T& v) {                                                              ((void) sizeof ((                                                             it >= Data && it <= Data + Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             it >= Data && it <= Data + Size                                                             ) ; else __assert_fail (                                                             "it >= Data && it <= Data + Size"                                                             , "../imgui/imgui.h", 2289, __extension__ __PRETTY_FUNCTION__); }))                                                                                                       ; const ptrdiff_t off = it - Data; if (Size == Capacity) reserve(_grow_capacity(Size + 1)); if (off < (int)Size) memmove(Data + off + 1, Data + off, ((size_t)Size - (size_t)off) * sizeof(T)); memcpy(&Data[off], &v, sizeof(v)); Size++; return Data + off; }
     inline bool contains(const T& v) const { const T* data = Data; const T* data_end = Data + Size; while (data < data_end) if (*data++ == v) return true; return false; }
     inline T* find(const T& v) { T* data = Data; const T* data_end = Data + Size; while (data < data_end) if (*data == v) break; else ++data; return data; }
     inline const T* find(const T& v) const { const T* data = Data; const T* data_end = Data + Size; while (data < data_end) if (*data == v) break; else ++data; return data; }
     inline int find_index(const T& v) const { const T* data_end = Data + Size; const T* it = find(v); if (it == data_end) return -1; const ptrdiff_t off = it - Data; return (int)off; }
     inline bool find_erase(const T& v) { const T* it = find(v); if (it < Data + Size) { erase(it); return true; } return false; }
     inline bool find_erase_unsorted(const T& v) { const T* it = find(v); if (it < Data + Size) { erase_unsorted(it); return true; } return false; }
-    inline int index_from_ptr(const T* it) const {                                                              ((void) sizeof ((                                                             it >= Data && it < Data + Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             it >= Data && it < Data + Size                                                             ) ; else __assert_fail (                                                             "it >= Data && it < Data + Size"                                                             , "../imgui/imgui.h", 2207, __extension__ __PRETTY_FUNCTION__); }))                                                                                                      ; const ptrdiff_t off = it - Data; return (int)off; }
+    inline int index_from_ptr(const T* it) const {                                                              ((void) sizeof ((                                                             it >= Data && it < Data + Size                                                             ) ? 1 : 0), __extension__ ({ if (                                                             it >= Data && it < Data + Size                                                             ) ; else __assert_fail (                                                             "it >= Data && it < Data + Size"                                                             , "../imgui/imgui.h", 2296, __extension__ __PRETTY_FUNCTION__); }))                                                                                                      ; const ptrdiff_t off = it - Data; return (int)off; }
 };
 struct ImGuiStyle
 {
+    float FontSizeBase;
+    float FontScaleMain;
+    float FontScaleDpi;
     float Alpha;
     float DisabledAlpha;
     ImVec2 WindowPadding;
     float WindowRounding;
     float WindowBorderSize;
+    float WindowBorderHoverPadding;
     ImVec2 WindowMinSize;
     ImVec2 WindowTitleAlign;
     ImGuiDir WindowMenuButtonPosition;
@@ -1294,13 +1322,18 @@ struct ImGuiStyle
     float GrabMinSize;
     float GrabRounding;
     float LogSliderDeadzone;
+    float ImageBorderSize;
     float TabRounding;
     float TabBorderSize;
-    float TabMinWidthForCloseButton;
+    float TabCloseButtonMinWidthSelected;
+    float TabCloseButtonMinWidthUnselected;
     float TabBarBorderSize;
     float TabBarOverlineSize;
     float TableAngledHeadersAngle;
     ImVec2 TableAngledHeadersTextAlign;
+    ImGuiTreeNodeFlags TreeLinesFlags;
+    float TreeLinesSize;
+    float TreeLinesRounding;
     ImGuiDir ColorButtonPosition;
     ImVec2 ButtonTextAlign;
     ImVec2 SelectableTextAlign;
@@ -1322,6 +1355,8 @@ struct ImGuiStyle
     float HoverDelayNormal;
     ImGuiHoveredFlags HoverFlagsForTooltipMouse;
     ImGuiHoveredFlags HoverFlagsForTooltipNav;
+    float _MainScale;
+    float _NextFrameFontSizeBase;
     ImGuiStyle();
     void ScaleAllSizes(float scale_factor);
 };
@@ -1337,16 +1372,15 @@ struct ImGuiIO
     ImGuiConfigFlags ConfigFlags;
     ImGuiBackendFlags BackendFlags;
     ImVec2 DisplaySize;
+    ImVec2 DisplayFramebufferScale;
     float DeltaTime;
     float IniSavingRate;
     const char* IniFilename;
     const char* LogFilename;
     void* UserData;
     ImFontAtlas*Fonts;
-    float FontGlobalScale;
-    bool FontAllowUserScaling;
     ImFont* FontDefault;
-    ImVec2 DisplayFramebufferScale;
+    bool FontAllowUserScaling;
     bool ConfigNavSwapGamepadButtons;
     bool ConfigNavMoveSetMousePos;
     bool ConfigNavCaptureKeyboard;
@@ -1362,6 +1396,8 @@ struct ImGuiIO
     bool ConfigViewportsNoTaskBarIcon;
     bool ConfigViewportsNoDecoration;
     bool ConfigViewportsNoDefaultParent;
+    bool ConfigDpiScaleFonts;
+    bool ConfigDpiScaleViewports;
     bool MouseDrawCursor;
     bool ConfigMacOSXBehaviors;
     bool ConfigInputTrickleEventQueue;
@@ -1384,6 +1420,7 @@ struct ImGuiIO
     bool ConfigErrorRecoveryEnableTooltip;
     bool ConfigDebugIsDebuggerPresent;
     bool ConfigDebugHighlightIdConflicts;
+    bool ConfigDebugHighlightIdConflictsShowItemPicker;
     bool ConfigDebugBeginReturnValueOnce;
     bool ConfigDebugBeginReturnValueLoop;
     bool ConfigDebugIgnoreFocusLoss;
@@ -1550,12 +1587,13 @@ struct ImGuiTextBuffer
     ImVector<char> Buf;
     static char EmptyString[1];
     ImGuiTextBuffer() { }
-    inline char operator[](int i) const {                                                  ((void) sizeof ((                                                 Buf.Data !=                                                  ((void *)0)) ? 1 : 0), __extension__ ({ if (                                                 Buf.Data !=                                                  ((void *)0)) ; else __assert_fail (                                                 "Buf.Data != ((void *)0)"                                                 , "../imgui/imgui.h", 2701, __extension__ __PRETTY_FUNCTION__); }))                                                                            ; return Buf.Data[i]; }
+    inline char operator[](int i) const {                                                  ((void) sizeof ((                                                 Buf.Data !=                                                  ((void *)0)) ? 1 : 0), __extension__ ({ if (                                                 Buf.Data !=                                                  ((void *)0)) ; else __assert_fail (                                                 "Buf.Data != ((void *)0)"                                                 , "../imgui/imgui.h", 2821, __extension__ __PRETTY_FUNCTION__); }))                                                                            ; return Buf.Data[i]; }
     const char* begin() const { return Buf.Data ? &Buf.front() : EmptyString; }
     const char* end() const { return Buf.Data ? &Buf.back() : EmptyString; }
     int size() const { return Buf.Size ? Buf.Size - 1 : 0; }
     bool empty() const { return Buf.Size <= 1; }
     void clear() { Buf.clear(); }
+    void resize(int size) { if (Buf.Size > size) Buf.Data[size] = 0; Buf.resize(size ? size + 1 : 0, 0); }
     void reserve(int capacity) { Buf.reserve(capacity); }
     const char* c_str() const { return Buf.Data ? Buf.Data : EmptyString; }
     void append(const char* str, const char* str_end =                                                                      ((void *)0)                                                                         );
@@ -1596,7 +1634,7 @@ struct ImGuiListClipper
     int DisplayEnd;
     int ItemsCount;
     float ItemsHeight;
-    float StartPosY;
+    double StartPosY;
     double StartSeekOffsetY;
     void* TempData;
     ImGuiListClipper();
@@ -1688,11 +1726,12 @@ struct ImGuiSelectionExternalStorage
     ImGuiSelectionExternalStorage();
     void ApplyRequests(ImGuiMultiSelectIO* ms_io);
 };
+typedef unsigned short ImDrawIdx;
 typedef void (*ImDrawCallback)(const ImDrawList* parent_list, const ImDrawCmd* cmd);
 struct ImDrawCmd
 {
     ImVec4 ClipRect;
-    ImTextureID TextureId;
+    ImTextureRef TexRef;
     unsigned int VtxOffset;
     unsigned int IdxOffset;
     unsigned int ElemCount;
@@ -1701,7 +1740,7 @@ struct ImDrawCmd
     int UserCallbackDataSize;
     int UserCallbackDataOffset;
     ImDrawCmd() { memset(this, 0, sizeof(*this)); }
-    inline ImTextureID GetTexID() const { return TextureId; }
+    inline ImTextureID GetTexID() const;
 };
 struct ImDrawVert
 {
@@ -1712,7 +1751,7 @@ struct ImDrawVert
 struct ImDrawCmdHeader
 {
     ImVec4 ClipRect;
-    ImTextureID TextureId;
+    ImTextureRef TexRef;
     unsigned int VtxOffset;
 };
 struct ImDrawChannel
@@ -1772,7 +1811,7 @@ struct ImDrawList
     ImDrawCmdHeader _CmdHeader;
     ImDrawListSplitter _Splitter;
     ImVector<ImVec4> _ClipRectStack;
-    ImVector<ImTextureID> _TextureIdStack;
+    ImVector<ImTextureRef> _TextureStack;
     ImVector<ImU8> _CallbacksDataBuf;
     float _FringeScale;
     const char* _OwnerName;
@@ -1781,8 +1820,8 @@ struct ImDrawList
     void PushClipRect(const ImVec2& clip_rect_min, const ImVec2& clip_rect_max, bool intersect_with_current_clip_rect = false);
     void PushClipRectFullScreen();
     void PopClipRect();
-    void PushTextureID(ImTextureID texture_id);
-    void PopTextureID();
+    void PushTexture(ImTextureRef tex_ref);
+    void PopTexture();
     inline ImVec2 GetClipRectMin() const { const ImVec4& cr = _ClipRectStack.back(); return ImVec2(cr.x, cr.y); }
     inline ImVec2 GetClipRectMax() const { const ImVec4& cr = _ClipRectStack.back(); return ImVec2(cr.z, cr.w); }
     void AddLine(const ImVec2& p1, const ImVec2& p2, ImU32 col, float thickness = 1.0f);
@@ -1806,9 +1845,9 @@ struct ImDrawList
     void AddPolyline(const ImVec2* points, int num_points, ImU32 col, ImDrawFlags flags, float thickness);
     void AddConvexPolyFilled(const ImVec2* points, int num_points, ImU32 col);
     void AddConcavePolyFilled(const ImVec2* points, int num_points, ImU32 col);
-    void AddImage(ImTextureID user_texture_id, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min = ImVec2(0, 0), const ImVec2& uv_max = ImVec2(1, 1), ImU32 col = (((ImU32)(255)<<24) | ((ImU32)(255)<<16) | ((ImU32)(255)<<8) | ((ImU32)(255)<<0)));
-    void AddImageQuad(ImTextureID user_texture_id, const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, const ImVec2& uv1 = ImVec2(0, 0), const ImVec2& uv2 = ImVec2(1, 0), const ImVec2& uv3 = ImVec2(1, 1), const ImVec2& uv4 = ImVec2(0, 1), ImU32 col = (((ImU32)(255)<<24) | ((ImU32)(255)<<16) | ((ImU32)(255)<<8) | ((ImU32)(255)<<0)));
-    void AddImageRounded(ImTextureID user_texture_id, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min, const ImVec2& uv_max, ImU32 col, float rounding, ImDrawFlags flags = 0);
+    void AddImage(ImTextureRef tex_ref, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min = ImVec2(0, 0), const ImVec2& uv_max = ImVec2(1, 1), ImU32 col = (((ImU32)(255)<<24) | ((ImU32)(255)<<16) | ((ImU32)(255)<<8) | ((ImU32)(255)<<0)));
+    void AddImageQuad(ImTextureRef tex_ref, const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, const ImVec2& uv1 = ImVec2(0, 0), const ImVec2& uv2 = ImVec2(1, 0), const ImVec2& uv3 = ImVec2(1, 1), const ImVec2& uv4 = ImVec2(0, 1), ImU32 col = (((ImU32)(255)<<24) | ((ImU32)(255)<<16) | ((ImU32)(255)<<8) | ((ImU32)(255)<<0)));
+    void AddImageRounded(ImTextureRef tex_ref, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min, const ImVec2& uv_max, ImU32 col, float rounding, ImDrawFlags flags = 0);
     inline void PathClear() { _Path.Size = 0; }
     inline void PathLineTo(const ImVec2& pos) { _Path.push_back(pos); }
     inline void PathLineToMergeDuplicate(const ImVec2& pos) { if (_Path.Size == 0 || memcmp(&_Path.Data[_Path.Size - 1], &pos, 8) != 0) _Path.push_back(pos); }
@@ -1835,14 +1874,15 @@ struct ImDrawList
     inline void PrimWriteVtx(const ImVec2& pos, const ImVec2& uv, ImU32 col) { _VtxWritePtr->pos = pos; _VtxWritePtr->uv = uv; _VtxWritePtr->col = col; _VtxWritePtr++; _VtxCurrentIdx++; }
     inline void PrimWriteIdx(ImDrawIdx idx) { *_IdxWritePtr = idx; _IdxWritePtr++; }
     inline void PrimVtx(const ImVec2& pos, const ImVec2& uv, ImU32 col) { PrimWriteIdx((ImDrawIdx)_VtxCurrentIdx); PrimWriteVtx(pos, uv, col); }
+    void _SetDrawListSharedData(ImDrawListSharedData* data);
     void _ResetForNewFrame();
     void _ClearFreeMemory();
     void _PopUnusedDrawCmd();
     void _TryMergeDrawCmds();
     void _OnChangedClipRect();
-    void _OnChangedTextureID();
+    void _OnChangedTexture();
     void _OnChangedVtxOffset();
-    void _SetTextureID(ImTextureID texture_id);
+    void _SetTexture(ImTextureRef tex_ref);
     int _CalcCircleAutoSegmentCount(float radius) const;
     void _PathArcToFastEx(const ImVec2& center, float radius, int a_min_sample, int a_max_sample, int a_step);
     void _PathArcToN(const ImVec2& center, float radius, float a_min, float a_max, int num_segments);
@@ -1858,44 +1898,102 @@ struct ImDrawData
     ImVec2 DisplaySize;
     ImVec2 FramebufferScale;
     ImGuiViewport* OwnerViewport;
+    ImVector<ImTextureData*>* Textures;
     ImDrawData() { Clear(); }
     void Clear();
     void AddDrawList(ImDrawList* draw_list);
     void DeIndexAllBuffers();
     void ScaleClipRects(const ImVec2& fb_scale);
 };
+enum ImTextureFormat
+{
+    ImTextureFormat_RGBA32,
+    ImTextureFormat_Alpha8,
+};
+enum ImTextureStatus
+{
+    ImTextureStatus_OK,
+    ImTextureStatus_Destroyed,
+    ImTextureStatus_WantCreate,
+    ImTextureStatus_WantUpdates,
+    ImTextureStatus_WantDestroy,
+};
+struct ImTextureRect
+{
+    unsigned short x, y;
+    unsigned short w, h;
+};
+struct ImTextureData
+{
+    int UniqueID;
+    ImTextureStatus Status;
+    void* BackendUserData;
+    ImTextureID TexID;
+    ImTextureFormat Format;
+    int Width;
+    int Height;
+    int BytesPerPixel;
+    unsigned char* Pixels;
+    ImTextureRect UsedRect;
+    ImTextureRect UpdateRect;
+    ImVector<ImTextureRect> Updates;
+    int UnusedFrames;
+    unsigned short RefCount;
+    bool UseColors;
+    bool WantDestroyNextFrame;
+    ImTextureData() { memset(this, 0, sizeof(*this)); }
+    ~ImTextureData() { DestroyPixels(); }
+    void Create(ImTextureFormat format, int w, int h);
+    void DestroyPixels();
+    void* GetPixels() {                                                      ((void) sizeof ((                                                     Pixels !=                                                      ((void *)0)) ? 1 : 0), __extension__ ({ if (                                                     Pixels !=                                                      ((void *)0)) ; else __assert_fail (                                                     "Pixels != ((void *)0)"                                                     , "../imgui/imgui.h", 3567, __extension__ __PRETTY_FUNCTION__); }))                                                                              ; return Pixels; }
+    void* GetPixelsAt(int x, int y) {                                                      ((void) sizeof ((                                                     Pixels !=                                                      ((void *)0)) ? 1 : 0), __extension__ ({ if (                                                     Pixels !=                                                      ((void *)0)) ; else __assert_fail (                                                     "Pixels != ((void *)0)"                                                     , "../imgui/imgui.h", 3568, __extension__ __PRETTY_FUNCTION__); }))                                                                              ; return Pixels + (x + y * Width) * BytesPerPixel; }
+    int GetSizeInBytes() const { return Width * Height * BytesPerPixel; }
+    int GetPitch() const { return Width * BytesPerPixel; }
+    ImTextureRef GetTexRef() { ImTextureRef tex_ref; tex_ref._TexData = this; tex_ref._TexID = ((ImTextureID)0); return tex_ref; }
+    ImTextureID GetTexID() const { return TexID; }
+    void SetTexID(ImTextureID tex_id) { TexID = tex_id; }
+    void SetStatus(ImTextureStatus status) { Status = status; }
+};
 struct ImFontConfig
 {
+    char Name[40];
     void* FontData;
     int FontDataSize;
     bool FontDataOwnedByAtlas;
     bool MergeMode;
     bool PixelSnapH;
-    int FontNo;
-    int OversampleH;
-    int OversampleV;
+    bool PixelSnapV;
+    ImS8 FontNo;
+    ImS8 OversampleH;
+    ImS8 OversampleV;
     float SizePixels;
-    ImVec2 GlyphExtraSpacing;
-    ImVec2 GlyphOffset;
     const ImWchar* GlyphRanges;
+    const ImWchar* GlyphExcludeRanges;
+    ImVec2 GlyphOffset;
     float GlyphMinAdvanceX;
     float GlyphMaxAdvanceX;
-    unsigned int FontBuilderFlags;
+    float GlyphExtraAdvanceX;
+    unsigned int FontLoaderFlags;
     float RasterizerMultiply;
     float RasterizerDensity;
     ImWchar EllipsisChar;
-    char Name[40];
+    ImFontFlags Flags;
     ImFont* DstFont;
+    const ImFontLoader* FontLoader;
+    void* FontLoaderData;
     ImFontConfig();
 };
 struct ImFontGlyph
 {
     unsigned int Colored : 1;
     unsigned int Visible : 1;
-    unsigned int Codepoint : 30;
+    unsigned int SourceIdx : 4;
+    unsigned int Codepoint : 26;
     float AdvanceX;
     float X0, Y0, X1, Y1;
     float U0, V0, U1, V1;
+    int PackId;
+    ImFontGlyph() { memset(this, 0, sizeof(*this)); PackId = -1; }
 };
 struct ImFontGlyphRangesBuilder
 {
@@ -1909,17 +2007,13 @@ struct ImFontGlyphRangesBuilder
     void AddRanges(const ImWchar* ranges);
     void BuildRanges(ImVector<ImWchar>* out_ranges);
 };
-struct ImFontAtlasCustomRect
+typedef int ImFontAtlasRectId;
+struct ImFontAtlasRect
 {
-    unsigned short X, Y;
-    unsigned short Width, Height;
-    unsigned int GlyphID : 31;
-    unsigned int GlyphColored : 1;
-    float GlyphAdvanceX;
-    ImVec2 GlyphOffset;
-    ImFont* Font;
-    ImFontAtlasCustomRect() { X = Y = 0xFFFF; Width = Height = 0; GlyphID = 0; GlyphColored = 0; GlyphAdvanceX = 0.0f; GlyphOffset = ImVec2(0, 0); Font =                                                                                                                                                                  ((void *)0)                                                                                                                                                                     ; }
-    bool IsPacked() const { return X != 0xFFFF; }
+    unsigned short x, y;
+    unsigned short w, h;
+    ImVec2 uv0, uv1;
+    ImFontAtlasRect() { memset(this, 0, sizeof(*this)); }
 };
 enum ImFontAtlasFlags_
 {
@@ -1934,96 +2028,122 @@ struct ImFontAtlas
     ~ImFontAtlas();
     ImFont* AddFont(const ImFontConfig* font_cfg);
     ImFont* AddFontDefault(const ImFontConfig* font_cfg =                                                                              ((void *)0)                                                                                 );
-    ImFont* AddFontFromFileTTF(const char* filename, float size_pixels, const ImFontConfig* font_cfg =                                                                                                                           ((void *)0)                                                                                                                              , const ImWchar* glyph_ranges =                                                                                                                                                               ((void *)0)                                                                                                                                                                  );
-    ImFont* AddFontFromMemoryTTF(void* font_data, int font_data_size, float size_pixels, const ImFontConfig* font_cfg =                                                                                                                                            ((void *)0)                                                                                                                                               , const ImWchar* glyph_ranges =                                                                                                                                                                                ((void *)0)                                                                                                                                                                                   );
-    ImFont* AddFontFromMemoryCompressedTTF(const void* compressed_font_data, int compressed_font_data_size, float size_pixels, const ImFontConfig* font_cfg =                                                                                                                                                                                  ((void *)0)                                                                                                                                                                                     , const ImWchar* glyph_ranges =                                                                                                                                                                                                                      ((void *)0)                                                                                                                                                                                                                         );
-    ImFont* AddFontFromMemoryCompressedBase85TTF(const char* compressed_font_data_base85, float size_pixels, const ImFontConfig* font_cfg =                                                                                                                                                                ((void *)0)                                                                                                                                                                   , const ImWchar* glyph_ranges =                                                                                                                                                                                                    ((void *)0)                                                                                                                                                                                                       );
+    ImFont* AddFontFromFileTTF(const char* filename, float size_pixels = 0.0f, const ImFontConfig* font_cfg =                                                                                                                                  ((void *)0)                                                                                                                                     , const ImWchar* glyph_ranges =                                                                                                                                                                      ((void *)0)                                                                                                                                                                         );
+    ImFont* AddFontFromMemoryTTF(void* font_data, int font_data_size, float size_pixels = 0.0f, const ImFontConfig* font_cfg =                                                                                                                                                   ((void *)0)                                                                                                                                                      , const ImWchar* glyph_ranges =                                                                                                                                                                                       ((void *)0)                                                                                                                                                                                          );
+    ImFont* AddFontFromMemoryCompressedTTF(const void* compressed_font_data, int compressed_font_data_size, float size_pixels = 0.0f, const ImFontConfig* font_cfg =                                                                                                                                                                                         ((void *)0)                                                                                                                                                                                            , const ImWchar* glyph_ranges =                                                                                                                                                                                                                             ((void *)0)                                                                                                                                                                                                                                );
+    ImFont* AddFontFromMemoryCompressedBase85TTF(const char* compressed_font_data_base85, float size_pixels = 0.0f, const ImFontConfig* font_cfg =                                                                                                                                                                       ((void *)0)                                                                                                                                                                          , const ImWchar* glyph_ranges =                                                                                                                                                                                                           ((void *)0)                                                                                                                                                                                                              );
+    void RemoveFont(ImFont* font);
+    void Clear();
+    void CompactCache();
     void ClearInputData();
     void ClearFonts();
     void ClearTexData();
-    void Clear();
-    bool Build();
-    void GetTexDataAsAlpha8(unsigned char** out_pixels, int* out_width, int* out_height, int* out_bytes_per_pixel =                                                                                                                                           ((void *)0)                                                                                                                                              );
-    void GetTexDataAsRGBA32(unsigned char** out_pixels, int* out_width, int* out_height, int* out_bytes_per_pixel =                                                                                                                                           ((void *)0)                                                                                                                                              );
-    bool IsBuilt() const { return Fonts.Size > 0 && TexReady; }
-    void SetTexID(ImTextureID id) { TexID = id; }
     const ImWchar* GetGlyphRangesDefault();
-    const ImWchar* GetGlyphRangesGreek();
-    const ImWchar* GetGlyphRangesKorean();
-    const ImWchar* GetGlyphRangesJapanese();
-    const ImWchar* GetGlyphRangesChineseFull();
-    const ImWchar* GetGlyphRangesChineseSimplifiedCommon();
-    const ImWchar* GetGlyphRangesCyrillic();
-    const ImWchar* GetGlyphRangesThai();
-    const ImWchar* GetGlyphRangesVietnamese();
-    int AddCustomRectRegular(int width, int height);
-    int AddCustomRectFontGlyph(ImFont* font, ImWchar id, int width, int height, float advance_x, const ImVec2& offset = ImVec2(0, 0));
-    ImFontAtlasCustomRect* GetCustomRectByIndex(int index) {                                                                  ((void) sizeof ((                                                                 index >= 0                                                                 ) ? 1 : 0), __extension__ ({ if (                                                                 index >= 0                                                                 ) ; else __assert_fail (                                                                 "index >= 0"                                                                 , "../imgui/imgui.h", 3519, __extension__ __PRETTY_FUNCTION__); }))                                                                                      ; return &CustomRects[index]; }
-    void CalcCustomRectUV(const ImFontAtlasCustomRect* rect, ImVec2* out_uv_min, ImVec2* out_uv_max) const;
-    bool GetMouseCursorTexData(ImGuiMouseCursor cursor, ImVec2* out_offset, ImVec2* out_size, ImVec2 out_uv_border[2], ImVec2 out_uv_fill[2]);
+    ImFontAtlasRectId AddCustomRect(int width, int height, ImFontAtlasRect* out_r =                                                                                              ((void *)0)                                                                                                 );
+    void RemoveCustomRect(ImFontAtlasRectId id);
+    bool GetCustomRect(ImFontAtlasRectId id, ImFontAtlasRect* out_r) const;
     ImFontAtlasFlags Flags;
-    ImTextureID TexID;
-    int TexDesiredWidth;
+    ImTextureFormat TexDesiredFormat;
     int TexGlyphPadding;
+    int TexMinWidth;
+    int TexMinHeight;
+    int TexMaxWidth;
+    int TexMaxHeight;
     void* UserData;
+    ImTextureRef TexRef;
+    ImTextureData* TexData;
+    ImVector<ImTextureData*> TexList;
     bool Locked;
-    bool TexReady;
+    bool RendererHasTextures;
+    bool TexIsBuilt;
     bool TexPixelsUseColors;
-    unsigned char* TexPixelsAlpha8;
-    unsigned int* TexPixelsRGBA32;
-    int TexWidth;
-    int TexHeight;
     ImVec2 TexUvScale;
     ImVec2 TexUvWhitePixel;
     ImVector<ImFont*> Fonts;
-    ImVector<ImFontAtlasCustomRect> CustomRects;
-    ImVector<ImFontConfig> ConfigData;
+    ImVector<ImFontConfig> Sources;
     ImVec4 TexUvLines[(32) + 1];
-    const ImFontBuilderIO* FontBuilderIO;
-    unsigned int FontBuilderFlags;
-    int PackIdMouseCursors;
-    int PackIdLines;
+    int TexNextUniqueID;
+    int FontNextUniqueID;
+    ImVector<ImDrawListSharedData*> DrawListSharedDatas;
+    ImFontAtlasBuilder* Builder;
+    const ImFontLoader* FontLoader;
+    const char* FontLoaderName;
+    void* FontLoaderData;
+    unsigned int FontLoaderFlags;
+    int RefCount;
+    ImGuiContext* OwnerContext;
 };
-struct ImFont
+struct ImFontBaked
 {
     ImVector<float> IndexAdvanceX;
     float FallbackAdvanceX;
-    float FontSize;
+    float Size;
+    float RasterizerDensity;
     ImVector<ImU16> IndexLookup;
     ImVector<ImFontGlyph> Glyphs;
-    const ImFontGlyph* FallbackGlyph;
+    int FallbackGlyphIndex;
+    float Ascent, Descent;
+    unsigned int MetricsTotalSurface:26;
+    unsigned int WantDestroy:1;
+    unsigned int LockLoadingFallback:1;
+    int LastUsedFrame;
+    ImGuiID BakedId;
+    ImFont* ContainerFont;
+    void* FontLoaderDatas;
+    ImFontBaked();
+    void ClearOutputData();
+    ImFontGlyph* FindGlyph(ImWchar c);
+    ImFontGlyph* FindGlyphNoFallback(ImWchar c);
+    float GetCharAdvance(ImWchar c);
+    bool IsGlyphLoaded(ImWchar c);
+};
+enum ImFontFlags_
+{
+    ImFontFlags_None = 0,
+    ImFontFlags_NoLoadError = 1 << 1,
+    ImFontFlags_NoLoadGlyphs = 1 << 2,
+    ImFontFlags_LockBakedSizes = 1 << 3,
+};
+struct ImFont
+{
+    ImFontBaked* LastBaked;
     ImFontAtlas* ContainerAtlas;
-    const ImFontConfig* ConfigData;
-    short ConfigDataCount;
-    short EllipsisCharCount;
+    ImFontFlags Flags;
+    float CurrentRasterizerDensity;
+    ImGuiID FontId;
+    float LegacySize;
+    ImVector<ImFontConfig*> Sources;
     ImWchar EllipsisChar;
     ImWchar FallbackChar;
-    float EllipsisWidth;
-    float EllipsisCharStep;
-    float Scale;
-    float Ascent, Descent;
-    int MetricsTotalSurface;
-    bool DirtyLookupTables;
     ImU8 Used8kPagesMap[(0xFFFF +1)/8192/8];
+    bool EllipsisAutoBake;
+    ImGuiStorage RemapPairs;
     ImFont();
     ~ImFont();
-    const ImFontGlyph*FindGlyph(ImWchar c);
-    const ImFontGlyph*FindGlyphNoFallback(ImWchar c);
-    float GetCharAdvance(ImWchar c) { return ((int)c < IndexAdvanceX.Size) ? IndexAdvanceX[(int)c] : FallbackAdvanceX; }
+    bool IsGlyphInFont(ImWchar c);
     bool IsLoaded() const { return ContainerAtlas !=                                                                                           ((void *)0)                                                                                              ; }
-    const char* GetDebugName() const { return ConfigData ? ConfigData->Name : "<unknown>"; }
+    const char* GetDebugName() const { return Sources.Size ? Sources[0]->Name : "<unknown>"; }
+    ImFontBaked* GetFontBaked(float font_size, float density = -1.0f);
     ImVec2 CalcTextSizeA(float size, float max_width, float wrap_width, const char* text_begin, const char* text_end =                                                                                                                                            ((void *)0)                                                                                                                                               , const char** remaining =                                                                                                                                                                           ((void *)0)                                                                                                                                                                              );
-    const char* CalcWordWrapPositionA(float scale, const char* text, const char* text_end, float wrap_width);
-    void RenderChar(ImDrawList* draw_list, float size, const ImVec2& pos, ImU32 col, ImWchar c);
+    const char* CalcWordWrapPosition(float size, const char* text, const char* text_end, float wrap_width);
+    void RenderChar(ImDrawList* draw_list, float size, const ImVec2& pos, ImU32 col, ImWchar c, const ImVec4* cpu_fine_clip =                                                                                                                                                     ((void *)0)                                                                                                                                                        );
     void RenderText(ImDrawList* draw_list, float size, const ImVec2& pos, ImU32 col, const ImVec4& clip_rect, const char* text_begin, const char* text_end, float wrap_width = 0.0f, bool cpu_fine_clip = false);
-    void BuildLookupTable();
     void ClearOutputData();
-    void GrowIndex(int new_size);
-    void AddGlyph(const ImFontConfig* src_cfg, ImWchar c, float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1, float advance_x);
-    void AddRemapChar(ImWchar dst, ImWchar src, bool overwrite_dst = true);
-    void SetGlyphVisible(ImWchar c, bool visible);
+    void AddRemapChar(ImWchar from_codepoint, ImWchar to_codepoint);
     bool IsGlyphRangeUnused(unsigned int c_begin, unsigned int c_last);
 };
+inline ImTextureID ImTextureRef::GetTexID() const
+{
+   ((void) sizeof ((   !(_TexData !=    ((void *)0)    && _TexID != ((ImTextureID)0))   ) ? 1 : 0), __extension__ ({ if (   !(_TexData !=    ((void *)0)    && _TexID != ((ImTextureID)0))   ) ; else __assert_fail (   "!(_TexData != ((void *)0) && _TexID != ((ImTextureID)0))"   , "../imgui/imgui.h", 3944, __extension__ __PRETTY_FUNCTION__); }))                                                                  ;
+    return _TexData ? _TexData->TexID : _TexID;
+}
+inline ImTextureID ImDrawCmd::GetTexID() const
+{
+    ImTextureID tex_id = TexRef._TexData ? TexRef._TexData->TexID : TexRef._TexID;
+    if (TexRef._TexData !=                           ((void *)0)                              )
+       ((void) sizeof ((       tex_id != ((ImTextureID)0) && "ImDrawCmd is referring to ImTextureData that wasn't uploaded to graphics system. Backend must call ImTextureData::SetTexID() after handling ImTextureStatus_WantCreate request!"       ) ? 1 : 0), __extension__ ({ if (       tex_id != ((ImTextureID)0) && "ImDrawCmd is referring to ImTextureData that wasn't uploaded to graphics system. Backend must call ImTextureData::SetTexID() after handling ImTextureStatus_WantCreate request!"       ) ; else __assert_fail (       "tex_id != ((ImTextureID)0) && \"ImDrawCmd is referring to ImTextureData that wasn't uploaded to graphics system. Backend must call ImTextureData::SetTexID() after handling ImTextureStatus_WantCreate request!\""       , "../imgui/imgui.h", 3955, __extension__ __PRETTY_FUNCTION__); }))                                                                                                                                                                                                                                    ;
+    return tex_id;
+}
 enum ImGuiViewportFlags_
 {
     ImGuiViewportFlags_None = 0,
@@ -2048,6 +2168,7 @@ struct ImGuiViewport
     ImGuiViewportFlags Flags;
     ImVec2 Pos;
     ImVec2 Size;
+    ImVec2 FramebufferScale;
     ImVec2 WorkPos;
     ImVec2 WorkSize;
     float DpiScale;
@@ -2062,7 +2183,7 @@ struct ImGuiViewport
     bool PlatformRequestResize;
     bool PlatformRequestClose;
     ImGuiViewport() { memset(this, 0, sizeof(*this)); }
-    ~ImGuiViewport() {                          ((void) sizeof ((                         PlatformUserData ==                          ((void *)0)                          && RendererUserData ==                          ((void *)0)) ? 1 : 0), __extension__ ({ if (                         PlatformUserData ==                          ((void *)0)                          && RendererUserData ==                          ((void *)0)) ; else __assert_fail (                         "PlatformUserData == ((void *)0) && RendererUserData == ((void *)0)"                         , "../imgui/imgui.h", 3680, __extension__ __PRETTY_FUNCTION__); }))                                                                                        ; }
+    ~ImGuiViewport() {                          ((void) sizeof ((                         PlatformUserData ==                          ((void *)0)                          && RendererUserData ==                          ((void *)0)) ? 1 : 0), __extension__ ({ if (                         PlatformUserData ==                          ((void *)0)                          && RendererUserData ==                          ((void *)0)) ; else __assert_fail (                         "PlatformUserData == ((void *)0) && RendererUserData == ((void *)0)"                         , "../imgui/imgui.h", 4020, __extension__ __PRETTY_FUNCTION__); }))                                                                                        ; }
     ImVec2 GetCenter() const { return ImVec2(Pos.x + Size.x * 0.5f, Pos.y + Size.y * 0.5f); }
     ImVec2 GetWorkCenter() const { return ImVec2(WorkPos.x + WorkSize.x * 0.5f, WorkPos.y + WorkSize.y * 0.5f); }
 };
@@ -2077,6 +2198,8 @@ struct ImGuiPlatformIO
     void (*Platform_SetImeDataFn)(ImGuiContext* ctx, ImGuiViewport* viewport, ImGuiPlatformImeData* data);
     void* Platform_ImeUserData;
     ImWchar Platform_LocaleDecimalPoint;
+    int Renderer_TextureMaxWidth;
+    int Renderer_TextureMaxHeight;
     void* Renderer_RenderState;
     void (*Platform_CreateWindow)(ImGuiViewport* vp);
     void (*Platform_DestroyWindow)(ImGuiViewport* vp);
@@ -2085,6 +2208,7 @@ struct ImGuiPlatformIO
     ImVec2 (*Platform_GetWindowPos)(ImGuiViewport* vp);
     void (*Platform_SetWindowSize)(ImGuiViewport* vp, ImVec2 size);
     ImVec2 (*Platform_GetWindowSize)(ImGuiViewport* vp);
+    ImVec2 (*Platform_GetWindowFramebufferScale)(ImGuiViewport* vp);
     void (*Platform_SetWindowFocus)(ImGuiViewport* vp);
     bool (*Platform_GetWindowFocus)(ImGuiViewport* vp);
     bool (*Platform_GetWindowMinimized)(ImGuiViewport* vp);
@@ -2103,6 +2227,7 @@ struct ImGuiPlatformIO
     void (*Renderer_RenderWindow)(ImGuiViewport* vp, void* render_arg);
     void (*Renderer_SwapBuffers)(ImGuiViewport* vp, void* render_arg);
     ImVector<ImGuiPlatformMonitor> Monitors;
+    ImVector<ImTextureData*> Textures;
     ImVector<ImGuiViewport*> Viewports;
 };
 struct ImGuiPlatformMonitor
@@ -2116,27 +2241,31 @@ struct ImGuiPlatformMonitor
 struct ImGuiPlatformImeData
 {
     bool WantVisible;
+    bool WantTextInput;
     ImVec2 InputPos;
     float InputLineHeight;
+    ImGuiID ViewportId;
     ImGuiPlatformImeData() { memset(this, 0, sizeof(*this)); }
 };
 struct ImFontAtlas;
-struct ImFontBuilderIO;
-enum ImGuiFreeTypeBuilderFlags
+struct ImFontLoader;
+typedef unsigned int ImGuiFreeTypeLoaderFlags;
+enum ImGuiFreeTypeLoaderFlags_
 {
-    ImGuiFreeTypeBuilderFlags_NoHinting = 1 << 0,
-    ImGuiFreeTypeBuilderFlags_NoAutoHint = 1 << 1,
-    ImGuiFreeTypeBuilderFlags_ForceAutoHint = 1 << 2,
-    ImGuiFreeTypeBuilderFlags_LightHinting = 1 << 3,
-    ImGuiFreeTypeBuilderFlags_MonoHinting = 1 << 4,
-    ImGuiFreeTypeBuilderFlags_Bold = 1 << 5,
-    ImGuiFreeTypeBuilderFlags_Oblique = 1 << 6,
-    ImGuiFreeTypeBuilderFlags_Monochrome = 1 << 7,
-    ImGuiFreeTypeBuilderFlags_LoadColor = 1 << 8,
-    ImGuiFreeTypeBuilderFlags_Bitmap = 1 << 9
+    ImGuiFreeTypeLoaderFlags_NoHinting = 1 << 0,
+    ImGuiFreeTypeLoaderFlags_NoAutoHint = 1 << 1,
+    ImGuiFreeTypeLoaderFlags_ForceAutoHint = 1 << 2,
+    ImGuiFreeTypeLoaderFlags_LightHinting = 1 << 3,
+    ImGuiFreeTypeLoaderFlags_MonoHinting = 1 << 4,
+    ImGuiFreeTypeLoaderFlags_Bold = 1 << 5,
+    ImGuiFreeTypeLoaderFlags_Oblique = 1 << 6,
+    ImGuiFreeTypeLoaderFlags_Monochrome = 1 << 7,
+    ImGuiFreeTypeLoaderFlags_LoadColor = 1 << 8,
+    ImGuiFreeTypeLoaderFlags_Bitmap = 1 << 9,
 };
 namespace ImGuiFreeType
 {
-    const ImFontBuilderIO* GetBuilderForFreeType();
+    const ImFontLoader* GetFontLoader();
     void SetAllocatorFunctions(void* (*alloc_func)(size_t sz, void* user_data), void (*free_func)(void* ptr, void* user_data), void* user_data = nullptr);
+    bool DebugEditFontLoaderFlags(ImGuiFreeTypeLoaderFlags* p_font_loader_flags);
 }
